@@ -35,7 +35,7 @@ function Recuperar() {
         <button type="submit" className="w-full bg-accent hover:bg-blue-700 py-2 rounded font-bold">
           Enviar enlace
         </button>
-        {enviado && <p className="text-green-400 text-sm text-center mt-2">✅ ¡Correo enviado correctamente!</p>}
+        {enviado && <p className="text-purple-400 text-sm text-center mt-2">✅ ¡Correo enviado correctamente!</p>}
       </form>
     </div>
   );

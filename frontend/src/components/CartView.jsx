@@ -10,41 +10,50 @@ function CartView() {
   );
 
   return (
-    <div className="p-6 text-white max-w-3xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-accent">🛒 Carrito de compras</h2>
+    <div className="glass-card p-6">
+      <h2 className="text-3xl neon-text mb-6">💎 Carrito de compras</h2>
 
       {cart.length === 0 ? (
-        <p className="text-muted">Tu carrito está vacío.</p>
+        <div className="text-center text-muted">
+          <p className="mb-4">Tu carrito está vacío.</p>
+          <button className="btn-futuristic">Comenzar a comprar</button>
+        </div>
       ) : (
         <div className="space-y-4">
           {cart.map((item) => (
             <div
               key={item.id}
-              className="bg-card p-4 rounded-xl flex items-center justify-between shadow"
+              className="glass-card hover-glow p-4 flex items-center gap-4"
             >
-              <div>
-                <h3 className="text-xl font-bold text-sky-400">{item.name}</h3>
-                <p className="text-sm text-muted">
-                  Gramos: {item.grams} x ${item.precio} = ${item.precio * item.grams}
-                </p>
-              </div>
               <img
                 src={item.imagen}
                 alt={item.name}
-                className="w-16 h-16 object-cover rounded-md"
+                className="w-16 h-16 object-cover rounded-lg"
               />
+              <div className="flex-1">
+                <h3 className="text-xl neon-text">{item.name}</h3>
+                <div className="flex justify-between items-center mt-2">
+                  <p className="text-muted">
+                    Gramos: {item.grams} x ${item.precio} = ${item.precio * item.grams}
+                  </p>
+                  <button
+                    onClick={() => clearCart()}
+                    className="btn-futuristic text-red-500 hover:text-red-400"
+                  >
+                    <Trash2 size={18} /> Eliminar
+                  </button>
+                </div>
+              </div>
             </div>
           ))}
 
-          <div className="text-right mt-6">
-            <p className="text-xl font-semibold">
-              Total: <span className="text-accent">${total.toLocaleString()}</span>
-            </p>
-            <button
-              onClick={clearCart}
-              className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-            >
-              <Trash2 size={18} /> Vaciar carrito
+          <div className="mt-6">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-xl neon-text">Total:</span>
+              <span className="text-2xl neon-text">${total.toLocaleString()}</span>
+            </div>
+            <button className="btn-futuristic w-full">
+              Proceder al pago
             </button>
           </div>
         </div>

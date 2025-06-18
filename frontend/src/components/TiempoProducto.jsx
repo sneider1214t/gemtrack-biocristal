@@ -13,7 +13,7 @@ function TiempoProducto() {
         ].map((producto, i) => (
           <div key={i} className="bg-card p-5 rounded-xl shadow-md">
             <h3 className="text-xl font-semibold text-cyan-300 mb-1">{producto.nombre}</h3>
-            <p className="text-3xl font-bold text-green-400">{producto.dias} días</p>
+            <p className="text-3xl font-bold text-purple-400">{producto.dias} días</p>
             <p className="text-muted text-sm mt-1">Promedio de duración en stock</p>
           </div>
         ))}

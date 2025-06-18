@@ -8,7 +8,7 @@ function Tipos() {
           <p className="text-muted">Gemas preciosas convencionales</p>
         </div>
         <div className="bg-card p-4 rounded-xl shadow-xl">
-          <h3 className="text-xl font-semibold text-green-400 mb-2">Tipo B</h3>
+          <h3 className="text-xl font-semibold text-purple-400 mb-2">Tipo B</h3>
           <p className="text-muted">Gemas de colección limitada</p>
         </div>
       </div>

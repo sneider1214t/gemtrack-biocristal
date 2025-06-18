@@ -2,30 +2,21 @@ import React from "react";
 
 function RegistroDevolucionGarantiaModal({ onClose }) {
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
-      <div className="bg-card p-6 rounded-xl text-white shadow-xl w-full max-w-xl">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-accent">Registro de devolución y garantía</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-red-500 text-2xl"
-          >
-            &times;
-          </button>
-        </div>
-
-        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2">
-          <div className="bg-background p-3 rounded-lg shadow">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-sm">
+      <div className="bg-card p-6 rounded-xl text-white shadow-xl fixed top-4 left-1/2 -translate-x-1/2">
+        <h2 className="text-xl font-bold mb-4 text-accent">📦 Registro de devolución y garantía</h2>
+        <div className="space-y-2 max-h-[300px] overflow-y-auto">
+          <div className="bg-slate-700 p-3 rounded">
             <p className="text-sm">🧾 Producto: <strong>Esmeralda</strong></p>
             <p className="text-sm">🕒 Fecha: 2025-05-12</p>
             <p className="text-sm">📦 Motivo: Daño en transporte</p>
           </div>
-          <div className="bg-background p-3 rounded-lg shadow">
+          <div className="bg-slate-700 p-3 rounded">
             <p className="text-sm">🧾 Producto: Rubí</p>
             <p className="text-sm">🕒 Fecha: 2025-05-11</p>
             <p className="text-sm">📦 Motivo: Garantía por defecto</p>
           </div>
-          <div className="bg-background p-3 rounded-lg shadow">
+          <div className="bg-slate-700 p-3 rounded">
             <p className="text-sm">🧾 Producto: Amatista</p>
             <p className="text-sm">🕒 Fecha: 2025-05-10</p>
             <p className="text-sm">📦 Motivo: Solicitud de cambio</p>

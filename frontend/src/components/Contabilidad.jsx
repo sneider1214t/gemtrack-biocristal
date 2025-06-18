@@ -5,7 +5,7 @@ function Contabilidad() {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-card p-6 rounded-2xl shadow-lg">
-          <h3 className="text-xl font-semibold text-green-400 mb-2">Ingresos del mes</h3>
+          <h3 className="text-xl font-semibold text-purple-400 mb-2">Ingresos del mes</h3>
           <p className="text-2xl font-bold">$8.200.000</p>
           <p className="text-muted mt-1">Ventas totales registradas</p>
         </div>

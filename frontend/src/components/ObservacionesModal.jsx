@@ -1,7 +1,7 @@
 function ObservacionesModal({ onClose }) {
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center">
-      <div className="bg-card p-6 rounded-xl text-white shadow-xl w-full max-w-md">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-sm">
+      <div className="bg-card p-6 rounded-xl text-white shadow-xl fixed top-4 left-1/2 -translate-x-1/2">
         <h2 className="text-xl font-bold mb-4 text-accent">📝 Observaciones</h2>
         <textarea
           placeholder="Escribe tu observación..."

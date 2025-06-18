@@ -9,7 +9,7 @@ function Recordatorios() {
         </li>
         <li className="bg-card p-4 rounded-lg shadow flex justify-between">
           <span>Actualizar precios del Cuarzo</span>
-          <span className="text-green-400">Completado</span>
+          <span className="text-purple-400">Completado</span>
         </li>
       </ul>
     </div>

@@ -5,7 +5,7 @@ function NivelesStock() {
       <div className="space-y-4">
         <div className="bg-card p-4 rounded-xl shadow-xl flex justify-between">
           <span>Diamante</span>
-          <span className="text-green-400 font-bold">72 disponibles</span>
+          <span className="text-purple-400 font-bold">72 disponibles</span>
         </div>
         <div className="bg-card p-4 rounded-xl shadow-xl flex justify-between">
           <span>Rubí</span>

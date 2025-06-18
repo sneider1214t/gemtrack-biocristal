@@ -1,5 +1,5 @@
-function RegistroTablasModal({ onClose }) {
-  return (
+function RegistroTablasModal({ isOpen, onClose }) {
+  return isOpen ? (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center">
       <div className="bg-card text-white p-6 rounded-2xl shadow-xl w-full max-w-md relative">
         {/* Botón Cerrar (X) */}
@@ -37,7 +37,7 @@ function RegistroTablasModal({ onClose }) {
         </button>
       </div>
     </div>
-  );
+  ) : null;
 }
 
 export default RegistroTablasModal;

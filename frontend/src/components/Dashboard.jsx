@@ -91,7 +91,7 @@ function Dashboard() {
               onClick={() => setShowCart(true)}
             />
             {totalItems > 0 && (
-              <span className="absolute -top-3 -right-3 bg-red-600 text-white text-sm font-bold px-2 py-0.5 rounded-full shadow-md animate-bounce">
+              <span className="absolute -top-3 -right-3 bg-black text-white text-sm font-bold px-2 py-0.5 rounded-full shadow-md animate-bounce">
                 {totalItems}
               </span>
             )}
@@ -152,20 +152,20 @@ function Dashboard() {
                 <img src={selectedGem.imagen} alt={selectedGem.name} className="rounded-xl w-full object-cover" />
               </div>
               <div className="w-1/2">
-                <h2 className="text-2xl font-bold text-sky-400">{selectedGem.name}</h2>
+                <h2 className="text-2xl font-bold text-white">{selectedGem.name}</h2>
                 <p className="text-muted mt-1 mb-2">{selectedGem.descripcion}</p>
                 <p>💵 Precio por gramo: ${selectedGem.precio}</p>
                 <p>📦 Stock: {selectedGem.stock}</p>
 
                 <button
                   onClick={() => setShowComparison(!showComparison)}
-                  className="mt-4 w-full bg-sky-600 hover:bg-sky-700 text-white py-2 rounded font-bold"
+                  className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-bold"
                 >
                   {showComparison ? "Ocultar comparación" : "Comparar precio"}
                 </button>
 
                 {showComparison && (
-                  <div className="mt-4 text-cyan-200 text-sm space-y-1 animate-fade-in">
+                  <div className="mt-4 text-white text-sm space-y-1 animate-fade-in">
                     <p>💰 Sistema 1: ${selectedGem.precio + 1800}</p>
                     <p>💰 Sistema 2: ${selectedGem.precio + 3000}</p>
                     <p>💰 Sistema 3: ${selectedGem.precio + 1900}</p>
@@ -227,12 +227,12 @@ function Dashboard() {
                   <input type="text" placeholder="Dirección" className="w-full p-2 rounded bg-slate-700 text-white" value={formData.direccion} onChange={(e) => setFormData({ ...formData, direccion: e.target.value })} required />
                   <input type="tel" placeholder="Número de celular" className="w-full p-2 rounded bg-slate-700 text-white" value={formData.celular} onChange={(e) => setFormData({ ...formData, celular: e.target.value })} required />
 
-                  <button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded font-bold">
+                  <button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded font-bold">
                     Realizar compra
                   </button>
 
                   {mensajeEnviado && (
-                    <p className="text-green-400 font-semibold mt-2 text-center">
+                    <p className="text-purple-400 font-semibold mt-2 text-center">
                       ✅ ¡Recibo enviado al correo!
                     </p>
                   )}

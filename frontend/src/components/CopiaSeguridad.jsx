@@ -5,7 +5,7 @@ function CopiaSeguridad() {
 
       <div className="bg-card p-6 rounded-2xl shadow-xl max-w-lg">
         <p className="text-muted mb-2">Última copia realizada:</p>
-        <p className="text-green-400 text-lg font-semibold mb-6">
+        <p className="text-purple-400 text-lg font-semibold mb-6">
           📅 14 de mayo de 2025 - 10:32 a.m.
         </p>
 

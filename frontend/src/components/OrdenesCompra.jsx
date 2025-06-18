@@ -14,7 +14,7 @@ function OrdenesCompra() {
           <tr className="border-t border-slate-700">
             <td className="p-3">Cuarzo Rosa</td>
             <td className="p-3">120</td>
-            <td className="p-3 text-green-400">Entregado</td>
+            <td className="p-3 text-purple-400">Entregado</td>
           </tr>
           <tr className="border-t border-slate-700">
             <td className="p-3">Topacio Azul</td>

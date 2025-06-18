@@ -26,6 +26,8 @@ import GenerarDocumento from "./components/GenerarDocumento";
 import UbicacionesAlmacenes from "./components/UbicacionesAlmacenes";
 import Recordatorios from "./components/Recordatorios";
 import OrdenesCompra from "./components/OrdenesCompra";
+import Providers from "./components/Providers";
+import HistorialVentas from "./components/HistorialVentas";
 
 
 
@@ -47,6 +49,24 @@ function App() {
         {/* Rutas protegidas con layout */}
         <Route path="/dashboard" element={
           <ProtectedRoute>{withLayout(Dashboard)}</ProtectedRoute>
+        } />
+        <Route path="/gemas" element={
+          <ProtectedRoute>{withLayout(Gemstones)}</ProtectedRoute>
+        } />
+        <Route path="/categorias" element={
+          <ProtectedRoute>{withLayout(Categories)}</ProtectedRoute>
+        } />
+        <Route path="/proveedores" element={
+          <ProtectedRoute>{withLayout(Providers)}</ProtectedRoute>
+        } />
+        <Route path="/nueva-venta" element={
+          <ProtectedRoute>{withLayout(Sales)}</ProtectedRoute>
+        } />
+        <Route path="/historial-ventas" element={
+          <ProtectedRoute>{withLayout(HistorialVentas)}</ProtectedRoute>
+        } />
+        <Route path="/usuarios" element={
+          <ProtectedRoute>{withLayout(Usuarios)}</ProtectedRoute>
         } />
         <Route path="/gemstones" element={
           <ProtectedRoute>{withLayout(Gemstones)}</ProtectedRoute>
