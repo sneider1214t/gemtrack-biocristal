@@ -1,4 +1,6 @@
-function ObservacionesModal({ onClose }) {
+function ObservacionesModal({ isOpen, onClose }) {
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-60 backdrop-blur-sm">
       <div className="bg-card p-6 rounded-xl text-white shadow-xl fixed top-4 left-1/2 -translate-x-1/2">

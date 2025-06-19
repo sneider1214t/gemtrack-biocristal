@@ -1,6 +1,15 @@
 import { Bell, DollarSign, Save, Clock, Download, Tag, BarChart, FileText, MapPin, ShoppingBag } from 'lucide-react';
+import { useState } from 'react';
+import { navigate } from 'react-router-dom';
 
-function Section({ title, items, handleAlertas, handleContabilidad, handleCopiaSeguridad, handleTiempoProducto, handleDescargas, handleTipos, handleNivelesStock, handleGenerarDocumento, handleUbicacionesAlmacenes, handleRecordatorios, handleOrdenesCompra }) {
+function Section({ title, items }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleNavigate = (path) => {
+    navigate(path);
+    setIsOpen(false);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center">

@@ -6,6 +6,12 @@ import Formulario from "./components/Formulario";
 import Gemstones from "./components/Gemstones";
 import Categories from "./components/Categories";
 import Sales from "./components/Sales";
+import Observaciones from "./components/Observaciones";
+import Notificaciones from "./components/Notificaciones";
+import RegistroDevolucion from "./components/RegistroDevolucion";
+import RegistroTablas from "./components/RegistroTablas";
+import ImportExport from "./components/ImportExport";
+import Recuperar from "./components/Recuperar";
 import Customers from "./components/Customers";
 import Ubicacion from "./components/Ubicacion";
 import Ingresos from "./components/Ingresos";
@@ -45,6 +51,8 @@ function App() {
       <Routes>
         {/* Login sin layout */}
         <Route path="/" element={<Login />} />
+        <Route path="/recuperar" element={<Recuperar />} />
+        <Route path="/inicio" element={<ProtectedRoute>{withLayout(Dashboard)}</ProtectedRoute>} />
 
         {/* Rutas protegidas con layout */}
         <Route path="/dashboard" element={
@@ -56,6 +64,12 @@ function App() {
         <Route path="/categorias" element={
           <ProtectedRoute>{withLayout(Categories)}</ProtectedRoute>
         } />
+        <Route path="/categorías" element={
+          <ProtectedRoute>{withLayout(Categories)}</ProtectedRoute>
+        } />
+        <Route path="/administrar-usuarios" element={
+          <ProtectedRoute>{withLayout(Usuarios)}</ProtectedRoute>
+        } />
         <Route path="/proveedores" element={
           <ProtectedRoute>{withLayout(Providers)}</ProtectedRoute>
         } />
@@ -63,6 +77,9 @@ function App() {
           <ProtectedRoute>{withLayout(Sales)}</ProtectedRoute>
         } />
         <Route path="/historial-ventas" element={
+          <ProtectedRoute>{withLayout(HistorialVentas)}</ProtectedRoute>
+        } />
+        <Route path="/historial-de-ventas" element={
           <ProtectedRoute>{withLayout(HistorialVentas)}</ProtectedRoute>
         } />
         <Route path="/usuarios" element={
@@ -98,8 +115,53 @@ function App() {
         <Route path="/actualizaciones" element={
           <ProtectedRoute>{withLayout(Actualizaciones)}</ProtectedRoute>
         } />
-        <Route path="/usuarios" element={ // ✅ nueva ruta agregada
-          <ProtectedRoute>{withLayout(Usuarios)}</ProtectedRoute>
+        <Route path="/alertas" element={
+          <ProtectedRoute>{withLayout(Alertas)}</ProtectedRoute>
+        } />
+        <Route path="/contabilidad" element={
+          <ProtectedRoute>{withLayout(Contabilidad)}</ProtectedRoute>
+        } />
+        <Route path="/copia-seguridad" element={
+          <ProtectedRoute>{withLayout(CopiaSeguridad)}</ProtectedRoute>
+        } />
+        <Route path="/tiempo-producto" element={
+          <ProtectedRoute>{withLayout(TiempoProducto)}</ProtectedRoute>
+        } />
+        <Route path="/descargas" element={
+          <ProtectedRoute>{withLayout(Descargas)}</ProtectedRoute>
+        } />
+        <Route path="/tipos" element={
+          <ProtectedRoute>{withLayout(Tipos)}</ProtectedRoute>
+        } />
+        <Route path="/niveles-stock" element={
+          <ProtectedRoute>{withLayout(NivelesStock)}</ProtectedRoute>
+        } />
+        <Route path="/generar-documento" element={
+          <ProtectedRoute>{withLayout(GenerarDocumento)}</ProtectedRoute>
+        } />
+        <Route path="/ubicaciones-almacenes" element={
+          <ProtectedRoute>{withLayout(UbicacionesAlmacenes)}</ProtectedRoute>
+        } />
+        <Route path="/recordatorios" element={
+          <ProtectedRoute>{withLayout(Recordatorios)}</ProtectedRoute>
+        } />
+        <Route path="/ordenes-compra" element={
+          <ProtectedRoute>{withLayout(OrdenesCompra)}</ProtectedRoute>
+        } />
+        <Route path="/observaciones" element={
+          <ProtectedRoute>{withLayout(Observaciones)}</ProtectedRoute>
+        } />
+        <Route path="/notificaciones" element={
+          <ProtectedRoute>{withLayout(Notificaciones)}</ProtectedRoute>
+        } />
+        <Route path="/registro-devolucion" element={
+          <ProtectedRoute>{withLayout(RegistroDevolucion)}</ProtectedRoute>
+        } />
+        <Route path="/registro-tablas" element={
+          <ProtectedRoute>{withLayout(RegistroTablas)}</ProtectedRoute>
+        } />
+        <Route path="/importar-exportar" element={
+          <ProtectedRoute>{withLayout(ImportExport)}</ProtectedRoute>
         } />
         <Route path="/alertas" element={
           <ProtectedRoute>{withLayout(Alertas)}</ProtectedRoute>

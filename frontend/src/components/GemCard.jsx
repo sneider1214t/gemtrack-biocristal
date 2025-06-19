@@ -1,19 +1,22 @@
 import { useState } from "react";
 import { useCart } from "../context/CartContext";
+import GemaDetailModal from "./GemaDetailModal";
 
-export default function GemCard({ gem, onViewDetail, rol }) {
+export default function GemCard({ gem, rol }) {
   const [grams, setGrams] = useState(1);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const { addToCart } = useCart();
 
   const increaseGrams = () => setGrams((prev) => prev + 1);
   const decreaseGrams = () => setGrams((prev) => (prev > 1 ? prev - 1 : 1));
 
   return (
-    <div className="product-card hover-glow">
-      <div
-        onClick={() => rol === "admin" && onViewDetail && onViewDetail(gem)}
-        className={`overflow-hidden rounded-t-xl ${rol === "admin" ? "cursor-pointer" : "cursor-default"}`}
-      >
+    <>
+      <div className="product-card hover-glow">
+        <div
+          onClick={() => setIsDetailOpen(true)}
+          className={`overflow-hidden rounded-t-xl cursor-pointer`}
+        >
         <img
           src={gem.imagen || "/img/zafiro.png"}
           alt={gem.name}
@@ -58,5 +61,7 @@ export default function GemCard({ gem, onViewDetail, rol }) {
         </button>
       </div>
     </div>
+    <GemaDetailModal isOpen={isDetailOpen} onClose={() => setIsDetailOpen(false)} gem={gem} />
+    </>
   );
 }

@@ -49,6 +49,14 @@ import OrdenesCompraModal from "./OrdenesCompraModal";
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isAdmin, setIsAdmin] = useState(false); // Estado para verificar si es administrador
+
+  // Simulación de verificación de rol (en producción usaría un servicio de autenticación)
+  useEffect(() => {
+    // Aquí iría la lógica real para verificar el rol del usuario
+    // Por ahora, simulamos que el usuario es administrador
+    setIsAdmin(true);
+  }, []);
 
   // Estados para secciones del menú
   const [openSections, setOpenSections] = useState({
@@ -103,12 +111,9 @@ function Sidebar() {
     navigate(path);
   };
 
-  // Manejo centralizado de modales
-  const handleModalOpen = (modal) => {
-    setModalStates(prev => ({
-      ...prev,
-      [modal]: true
-    }));
+  // Manejo de navegación
+  const handleNavigate = (path) => {
+    navigate(path);
   };
 
   // Asegurar que el estado de registroTablas esté inicializado como false
@@ -119,28 +124,7 @@ function Sidebar() {
     }));
   }, []);
 
-  const handleCloseModal = (modal) => {
-    setModalStates(prev => ({
-      ...prev,
-      [modal]: false
-    }));
-  };
-
-  // Funciones de manejo de modales
-  const handleObservaciones = () => handleModalOpen('observaciones');
-  const handleNotificaciones = () => handleModalOpen('notificaciones');
-  const handleRegistroDevolucion = () => handleModalOpen('registroDevolucion');
-  const handleRegistroTablas = () => handleModalOpen('registroTablas');
-  const handleAlertas = () => handleModalOpen('alertas');
-  const handleContabilidad = () => handleModalOpen('contabilidad');
-  const handleCopiaSeguridad = () => handleModalOpen('copiaSeguridad');
-  const handleTiempoProducto = () => handleModalOpen('tiempoProducto');
-  const handleDescargas = () => handleModalOpen('descargas');
-  const handleTipos = () => handleModalOpen('tipos');
-  const handleNivelesStock = () => handleModalOpen('nivelesStock');
-  const handleGenerarDocumento = () => handleModalOpen('generarDocumento');
-  const handleUbicacionesAlmacenes = () => handleModalOpen('ubicacionesAlmacenes');
-  const handleRecordatorios = () => handleModalOpen('recordatorios');
+  // Efecto para cerrar todos los modales al cambiar de ruta
   const handleOrdenesCompra = () => handleModalOpen('ordenesCompra');
 
   // Efecto para cerrar todos los modales al cambiar de ruta
@@ -191,10 +175,10 @@ function Sidebar() {
               onClick={() => {
                 switch (item.label) {
                   case "Observaciones":
-                    handleModalOpen('observaciones');
+                    handleNavigate('/observaciones');
                     break;
                   case "Notificaciones":
-                    handleModalOpen('notificaciones');
+                    handleNavigate('/notificaciones');
                     break;
                   case "Registro devolución":
                     handleModalOpen('registroDevolucion');
@@ -206,37 +190,37 @@ function Sidebar() {
                     handleModalOpen('importExport');
                     break;
                   case "Alertas":
-                    handleModalOpen('alertas');
+                    handleNavigate('/alertas');
                     break;
                   case "Contabilidad":
-                    handleModalOpen('contabilidad');
+                    handleNavigate('/contabilidad');
                     break;
                   case "Copia de seguridad":
-                    handleModalOpen('copiaSeguridad');
+                    handleNavigate('/copia-seguridad');
                     break;
                   case "Tiempo de producto":
-                    handleModalOpen('tiempoProducto');
+                    handleNavigate('/tiempo-producto');
                     break;
                   case "Descargas":
-                    handleModalOpen('descargas');
+                    handleNavigate('/descargas');
                     break;
                   case "Tipos":
-                    handleModalOpen('tipos');
+                    handleNavigate('/tipos');
                     break;
                   case "Niveles de stock":
-                    handleModalOpen('nivelesStock');
+                    handleNavigate('/niveles-stock');
                     break;
                   case "Generar documento":
-                    handleModalOpen('generarDocumento');
+                    handleNavigate('/generar-documento');
                     break;
                   case "Ubicaciones almacenes":
-                    handleModalOpen('ubicacionesAlmacenes');
+                    handleNavigate('/ubicaciones-almacenes');
                     break;
                   case "Recordatorios":
-                    handleModalOpen('recordatorios');
+                    handleNavigate('/recordatorios');
                     break;
                   case "Órdenes de compra":
-                    handleModalOpen('ordenesCompra');
+                    handleNavigate('/ordenes-compra');
                     break;
                   default:
                     handleToggleRoute(`/${item.path || item.label.toLowerCase().replace(/\s+/g, '-')}`);
@@ -271,16 +255,8 @@ function Sidebar() {
       icon: Gem,
       items: [
         {
-          label: "Gemas",
-          icon: Gem
-        },
-        {
           label: "Categorías",
           icon: Tag
-        },
-        {
-          label: "Proveedores",
-          icon: Truck
         }
       ]
     },
@@ -289,10 +265,6 @@ function Sidebar() {
       title: "Ventas",
       icon: ShoppingCart,
       items: [
-        {
-          label: "Nueva venta",
-          icon: PlusCircle
-        },
         {
           label: "Historial de ventas",
           icon: History
@@ -335,10 +307,6 @@ function Sidebar() {
         {
           label: "Copia de seguridad",
           icon: Save
-        },
-        {
-          label: "Tiempo de producto",
-          icon: Clock
         },
         {
           label: "Descargas",
@@ -392,15 +360,16 @@ function Sidebar() {
       </div>
 
       {sections.map((section) => (
-        <Section
-          key={section.id}
-          title={section.title}
-          id={section.id}
-          icon={section.icon}
-          items={section.items}
-          handleModalOpen={handleModalOpen}
-          handleCloseModal={handleCloseModal}
-        />
+        // Solo mostrar la sección de usuarios si es administrador
+        section.id === "usuarios" && !isAdmin ? null : (
+          <Section
+            key={section.id}
+            title={section.title}
+            id={section.id}
+            icon={section.icon}
+            items={section.items}
+          />
+        )
       ))}
 
       <ObservacionesModal
