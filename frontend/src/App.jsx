@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import Sidebar from "./components/Sidebar";
@@ -49,6 +49,9 @@ function App() {
   return (
     <CartProvider>
       <Routes>
+        {/* Redirección de la ruta base */}
+        <Route path="/gemtrack-biocristal/*" element={<Navigate to="/inicio" replace />} />
+        
         {/* Login sin layout */}
         <Route path="/" element={<Login />} />
         <Route path="/recuperar" element={<Recuperar />} />
