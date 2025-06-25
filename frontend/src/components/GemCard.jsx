@@ -18,7 +18,7 @@ export default function GemCard({ gem, rol }) {
           className={`overflow-hidden rounded-t-xl cursor-pointer`}
         >
         <img
-          src={gem.imagen || "/img/zafiro.png"}
+          src={gem.imagen || "/gemtrack-biocristal/img/zafiro.png"}
           alt={gem.name}
           className="w-full h-[200px] object-cover transition-transform duration-300 hover:scale-105"
         />

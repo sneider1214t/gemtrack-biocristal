@@ -17,7 +17,7 @@ function GemaDetailModal({ isOpen, onClose, gem }) {
         <div className="space-y-4">
           <div className="flex gap-4">
             <img
-              src={gem.imagen || new URL('/img/zafiro.png', import.meta.url).href}
+              src={gem.imagen || "/gemtrack-biocristal/img/zafiro.png"}
               alt={gem.name}
               className="w-64 h-64 object-cover rounded-lg"
             />
