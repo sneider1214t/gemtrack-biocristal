@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { pool } from "./src/config/db.js"; // Si lo necesitas aquí, o si no lo usas, puedes omitirlo
+
 import routerCategorias from "./src/routes/Categorias.routes.js";
 
 // Cargar variables de entorno desde .env
