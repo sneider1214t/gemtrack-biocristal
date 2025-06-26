@@ -1,11 +1,16 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import db from "./src/config/db.js"; // Asegúrate que el archivo tenga extensión .js
+import { pool } from "./src/config/db.js"; // Si lo necesitas aquí, o si no lo usas, puedes omitirlo
 import routerCategorias from "./src/routes/Categorias.routes.js";
 
-app = express();
+// Cargar variables de entorno desde .env
+dotenv.config();
 
+// Crear instancia de express
+const app = express();
+
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
@@ -14,10 +19,13 @@ app.get("/", (req, res) => {
   res.send("Servidor backend de Biocristal funcionando correctamente ✅");
 });
 
+// Rutas de la API
 app.use("/api/categorias", routerCategorias);
 
+// Puerto desde .env o por defecto 5000
 const PORT = process.env.PORT || 5000;
 
+// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
