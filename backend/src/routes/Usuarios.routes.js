@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { pool } from "../config/db.js";
-
 const router = Router();
 
 // Obtener todos los usuarios

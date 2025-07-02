@@ -1,5 +1,5 @@
-import { Router } from 'express';
-import { pool } from '../db.js';
+import { Router } from "express";
+import { pool } from "../config/db.js";
 const router = Router();
 
 // Obtener todas las ubicaciones
