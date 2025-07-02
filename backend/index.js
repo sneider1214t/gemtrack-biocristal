@@ -3,7 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import routerCategorias from "./src/routes/Categorias.routes.js";
-import routerClientes from "./src/routes/Clientes.routes.js"; // si lo usas
+import routerClientes from "./src/routes/Clientes.routes.js"; 
+import routerDevolucion from "./src/routes/Devolucion.routes.js"; 
 
 dotenv.config();
 
@@ -17,7 +18,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/categorias", routerCategorias);
-app.use("/api/clientes", routerClientes); // si aplica
+app.use("/api/clientes", routerClientes);
+app.use("/api/devolucion", routerDevolucion);
 
 // ✅ SOLO iniciar el servidor si NO estás ejecutando los tests
 if (process.env.NODE_ENV !== "test") {
