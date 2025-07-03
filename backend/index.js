@@ -4,7 +4,11 @@ import dotenv from "dotenv";
 
 import routerCategorias from "./src/routes/Categorias.routes.js";
 import routerClientes from "./src/routes/Clientes.routes.js"; 
-import routerDevolucion from "./src/routes/Devolucion.routes.js"; 
+import routerDevolucion from "./src/routes/Devolucion.routes.js";
+import routerExportacion from "./src/routes/Exportacion.routes.js";
+import routerFactura from "./src/routes/Factura.routes.js";
+import routerImportacion from "./src/routes/Importacion.routes.js";
+import routerMantenimiento from "./src/routes/Mantenimiento.routes.js";
 
 dotenv.config();
 
@@ -20,6 +24,10 @@ app.get("/", (req, res) => {
 app.use("/api/categorias", routerCategorias);
 app.use("/api/clientes", routerClientes);
 app.use("/api/devolucion", routerDevolucion);
+app.use("/api/exportacion", routerExportacion);
+app.use("/api/factura", routerFactura);
+app.use("/api/importacion", routerImportacion);
+app.use("/api/mantenimiento", routerMantenimiento);
 
 // ✅ SOLO iniciar el servidor si NO estás ejecutando los tests
 if (process.env.NODE_ENV !== "test") {
