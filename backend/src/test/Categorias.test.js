@@ -3,8 +3,8 @@ import app from '../../index.js'; // ✅ Importamos directamente la app desde in
 
 describe('🔷 API /api/categorias - Biocristal', () => {
   const categoriaNueva = {
-    id_categoria: 'CAT001',
-    nombre_categoria: 'Cuarzos'
+    id_categoria: 'CAT002',
+    nombre_categoria: 'Cuarzos rojos'
   };
 
   const categoriaActualizada = {
