@@ -9,6 +9,7 @@ import routerExportacion from "./src/routes/Exportacion.routes.js";
 import routerFactura from "./src/routes/Factura.routes.js";
 import routerImportacion from "./src/routes/Importacion.routes.js";
 import routerMantenimiento from "./src/routes/Mantenimiento.routes.js";
+import routerProductos from "./src/routes/Productos.routes.js";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/api/exportacion", routerExportacion);
 app.use("/api/factura", routerFactura);
 app.use("/api/importacion", routerImportacion);
 app.use("/api/mantenimiento", routerMantenimiento);
+app.use("/api/productos", routerProductos);
 
 // ✅ SOLO iniciar el servidor si NO estás ejecutando los tests
 if (process.env.NODE_ENV !== "test") {

@@ -1,17 +1,17 @@
 import request from 'supertest';
-import app from '../../index.js';
+import app from '../../index.js'; // ✅ Asegúrate de importar tu app correctamente
 
-describe('🛠️ API /api/mantenimiento - Biocristal', () => {
+describe('🔧 API /api/mantenimiento - Biocristal', () => {
   const mantenimientoNuevo = {
-    id_mantenimiento: 'MAN001',
-    fecha_mantenimiento: '2025-07-02T10:00:00',
-    proximo_mantenimiento: '2026-01-01T10:00:00',
-    codigo_producto: 'PROD001'
+    id_mantenimiento: 'MT001',
+    fecha_mantenimiento: '2025-12-01 10:00:00',
+    proximo_mantenimiento: '2026-01-04 10:00:00',
+    codigo_producto: 'PROD001' // Asegúrate de que este producto exista
   };
 
   const mantenimientoActualizado = {
-    fecha_mantenimiento: '2025-08-01T12:00:00',
-    proximo_mantenimiento: '2026-01-04T10:00:00',
+    fecha_mantenimiento: '2025-12-02 11:00:00',
+    proximo_mantenimiento: '2026-01-05 11:00:00',
     codigo_producto: 'PROD001'
   };
 
@@ -49,18 +49,21 @@ describe('🛠️ API /api/mantenimiento - Biocristal', () => {
       .send(mantenimientoActualizado)
       .expect(200);
 
-    console.log('🔁 Mantenimiento actualizado:', res.body);
+    console.log('🛠️ Mantenimiento actualizado:', res.body);
     expect(res.body.message).toBe('Mantenimiento actualizado correctamente');
   });
 
   it('📌 Confirmar mantenimiento actualizado', async () => {
-    const res = await request(app)
+  const res = await request(app)
       .get(`/api/mantenimiento/${mantenimientoNuevo.id_mantenimiento}`)
       .expect(200);
 
     console.log('📌 Mantenimiento actualizado:', res.body);
-    expect(res.body.proximo_mantenimiento).toBe(mantenimientoActualizado.proximo_mantenimiento);
+    const recibido = new Date(res.body.proximo_mantenimiento).toISOString().replace('T', ' ').slice(0, 19);
+    const esperado = new Date(mantenimientoActualizado.proximo_mantenimiento).toISOString().replace('T', ' ').slice(0, 19);
+    expect(recibido).toBe(esperado); // ✅
   });
+
 
   it('🗑️ Eliminar mantenimiento', async () => {
     const res = await request(app)
@@ -79,4 +82,3 @@ describe('🛠️ API /api/mantenimiento - Biocristal', () => {
     console.log(`❌ Confirmado: mantenimiento con ID ${mantenimientoNuevo.id_mantenimiento} fue eliminado`);
   });
 });
-
