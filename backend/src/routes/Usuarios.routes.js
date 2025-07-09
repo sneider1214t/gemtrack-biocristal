@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { pool } from "../config/db.js";
+
+import { hash } from "../config/encrypting.js"
 const router = Router();
 
 // Obtener todos los usuarios
@@ -49,6 +51,7 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "Todos los campos son requeridos" });
   }
 
+  const passHash = await hash(contraseña_usuario); 
   try {
     const [result] = await pool.query(
       "INSERT INTO Usuarios (documento_usuario, nombre_usuario, email_usuario, rol_usuario, contraseña_usuario) VALUES (?, ?, ?, ?, ?)",
@@ -57,7 +60,7 @@ router.post("/", async (req, res) => {
         nombre_usuario,
         email_usuario,
         rol_usuario,
-        contraseña_usuario,
+        passHash,
       ]
     );
     res.status(201).json({ message: "Usuario creado correctamente" });

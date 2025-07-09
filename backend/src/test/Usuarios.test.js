@@ -1,22 +1,31 @@
 // src/test/Usuarios.test.js
 import request from 'supertest';
 import app from '../../index.js';
+import { hash } from '../config/encrypting.js';
 
 describe('👤 API /api/usuarios - Biocristal', () => {
-  const usuarioNuevo = {
-    documento_usuario: 1234567890,
-    nombre_usuario: 'Juan Pérez',
-    email_usuario: 'juan.perez@example.com',
-    rol_usuario: 1,
-    contraseña_usuario: 'securepass123'
-  };
+  const documentoTest = 1234567890;
 
-  const usuarioActualizado = {
-    nombre_usuario: 'Juan P. Gómez',
-    email_usuario: 'juan.gomez@example.com',
-    rol_usuario: 2,
-    contraseña_usuario: 'newpass456'
-  };
+  // Se preparan las variables para los usuarios ya hasheadas
+  let usuarioNuevo;
+  let usuarioActualizado;
+
+  beforeAll(async () => {
+    usuarioNuevo = {
+      documento_usuario: documentoTest,
+      nombre_usuario: 'Juan Pérez',
+      email_usuario: 'juan.perez@example.com',
+      rol_usuario: 1,
+      contraseña_usuario: await hash('securepass123') // 👈 contraseña hasheada
+    };
+
+    usuarioActualizado = {
+      nombre_usuario: 'Juan P. Gómez',
+      email_usuario: 'juan.gomez@example.com',
+      rol_usuario: 2,
+      contraseña_usuario: await hash('newpass456') // 👈 nueva contraseña hasheada
+    };
+  });
 
   it('📥 Crear usuario', async () => {
     const res = await request(app)
