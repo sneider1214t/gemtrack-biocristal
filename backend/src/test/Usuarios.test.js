@@ -72,21 +72,21 @@ describe('👤 API /api/usuarios - Biocristal', () => {
     expect(res.body.email_usuario).toBe(usuarioActualizado.email_usuario);
   });
 
-  // it('🗑️ Eliminar usuario', async () => {
-  //   const res = await request(app)
-  //     .delete(`/api/usuarios/${usuarioNuevo.documento_usuario}`)
-  //     .expect(200);
+  it('🗑️ Eliminar usuario', async () => {
+    const res = await request(app)
+      .delete(`/api/usuarios/${usuarioNuevo.documento_usuario}`)
+      .expect(200);
 
-  //   console.log('🧹 Usuario eliminado:', res.body);
-  //   expect(res.body.message).toBe('Usuario eliminado correctamente');
-  // });
+    console.log('🧹 Usuario eliminado:', res.body);
+    expect(res.body.message).toBe('Usuario eliminado correctamente');
+  });
 
-  // it('❌ Confirmar eliminación de usuario', async () => {
-  //   const res = await request(app)
-  //     .get(`/api/usuarios/${usuarioNuevo.documento_usuario}`)
-  //     .expect(404);
+  it('❌ Confirmar eliminación de usuario', async () => {
+    const res = await request(app)
+      .get(`/api/usuarios/${usuarioNuevo.documento_usuario}`)
+      .expect(404);
 
-  //   console.log(`❌ Confirmado: usuario con documento ${usuarioNuevo.documento_usuario} fue eliminado`);
-  //   expect(res.body.message).toBe('Usuario no encontrado');
-  // });
+    console.log(`❌ Confirmado: usuario con documento ${usuarioNuevo.documento_usuario} fue eliminado`);
+    expect(res.body.message).toBe('Usuario no encontrado');
+  });
 });
