@@ -1,3 +1,4 @@
+// src/test/Factura.test.js
 import request from 'supertest';
 import app from '../../index.js';
 
@@ -7,8 +8,20 @@ describe('🧾 API /api/factura - Biocristal', () => {
     fecha_factura: '2025-07-02 14:00:00',
     tipo_pago: 1,
     total_factura: 120000,
-    codigo_transaccion: 'TRANS001',  // Ya insertada en tu base de datos
-    documento_cliente: 2001          // Ya insertado también
+    codigo_transaccion: 'TRANS001',  // Debe existir en tu BD
+    documento_cliente: 2001,         // Debe existir en tu BD
+    productos_vendidos: [
+      {
+        codigo_producto: 'PROD001',
+        cantidad: 2,
+        precio_venta: 10000
+      },
+      {
+        codigo_producto: 'PROD002',
+        cantidad: 1,
+        precio_venta: 20000
+      }
+    ]
   };
 
   const facturaActualizada = {
@@ -16,7 +29,19 @@ describe('🧾 API /api/factura - Biocristal', () => {
     tipo_pago: 0,
     total_factura: 135000,
     codigo_transaccion: 'TRANS001',
-    documento_cliente: 2001
+    documento_cliente: 2001,
+    productos_vendidos: [
+      {
+        codigo_producto: 'PROD001',
+        cantidad: 3,
+        precio_venta: 10000
+      },
+      {
+        codigo_producto: 'PROD003',
+        cantidad: 2,
+        precio_venta: 17500
+      }
+    ]
   };
 
   it('📦 Crear factura', async () => {
@@ -45,6 +70,7 @@ describe('🧾 API /api/factura - Biocristal', () => {
 
     console.log('🔎 Factura encontrada:', res.body);
     expect(res.body.codigo_factura).toBe(facturaNueva.codigo_factura);
+    expect(Array.isArray(res.body.productos_vendidos)).toBe(true);
   });
 
   it('✏️ Actualizar factura', async () => {
@@ -64,6 +90,7 @@ describe('🧾 API /api/factura - Biocristal', () => {
 
     console.log('📌 Factura actualizada:', res.body);
     expect(res.body.total_factura).toBe(facturaActualizada.total_factura);
+    expect(res.body.productos_vendidos[0].codigo_producto).toBe('PROD001');
   });
 
   it('🗑️ Eliminar factura', async () => {
@@ -83,3 +110,4 @@ describe('🧾 API /api/factura - Biocristal', () => {
     console.log(`❌ Confirmado: factura con código ${facturaNueva.codigo_factura} fue eliminada`);
   });
 });
+
