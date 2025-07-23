@@ -29,7 +29,7 @@ router.get('/:id', async (req, res) => {
 // Crear un nuevo producto
 router.post('/', async (req, res) => {
     const {
-        codigo_producto, nombre_producto, unidad_medida, precio_compra, precio_venta,  nombre_ubicacion, nit_proveedor, id_categoria
+        codigo_producto, nombre_producto, unidad_medida, precio_compra, precio_venta, nombre_ubicacion, nit_proveedor, id_categoria
     } = req.body;
 
     if (!codigo_producto || !nombre_producto || !unidad_medida || !precio_compra || !precio_venta || !nombre_ubicacion || !nit_proveedor || !id_categoria) {
@@ -41,7 +41,18 @@ router.post('/', async (req, res) => {
             'INSERT INTO Productos (codigo_producto, nombre_producto, unidad_medida, precio_compra, precio_venta, nombre_ubicacion, nit_proveedor, id_categoria) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [codigo_producto, nombre_producto, unidad_medida, precio_compra, precio_venta, nombre_ubicacion, nit_proveedor, id_categoria]
         );
-        res.status(201).json({ message: 'Producto creado correctamente' });
+
+        // Devolver el objeto insertado como respuesta
+        res.status(201).json({
+            codigo_producto,
+            nombre_producto,
+            unidad_medida,
+            precio_compra,
+            precio_venta,
+            nombre_ubicacion,
+            nit_proveedor,
+            id_categoria
+        });
     } catch (error) {
         res.status(500).json({ error: 'Error al crear el producto' });
     }
@@ -50,7 +61,7 @@ router.post('/', async (req, res) => {
 // Actualizar un producto existente
 router.put('/:id', async (req, res) => {
     const {
-        nombre_producto, unidad_medida, precio_compra, precio_venta, nombre_ubicacion,  nit_proveedor, id_categoria
+        nombre_producto, unidad_medida, precio_compra, precio_venta, nombre_ubicacion, nit_proveedor, id_categoria
     } = req.body;
 
     try {

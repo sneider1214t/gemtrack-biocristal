@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { pool } from "../config/db.js";
+import { hash } from "../config/encrypting.js";
 
-import { hash } from "../config/encrypting.js"
 const router = Router();
 
 // Obtener todos los usuarios
@@ -53,7 +53,7 @@ router.post("/", async (req, res) => {
 
   const passHash = await hash(contraseña_usuario); 
   try {
-    const [result] = await pool.query(
+    await pool.query(
       "INSERT INTO Usuarios (documento_usuario, nombre_usuario, email_usuario, rol_usuario, contraseña_usuario) VALUES (?, ?, ?, ?, ?)",
       [
         documento_usuario,
@@ -63,7 +63,15 @@ router.post("/", async (req, res) => {
         passHash,
       ]
     );
-    res.status(201).json({ message: "Usuario creado correctamente" });
+
+    // Devolver todos los datos incluyendo la contraseña hasheada
+    res.status(201).json({
+      documento_usuario,
+      nombre_usuario,
+      email_usuario,
+      rol_usuario,
+      contraseña_usuario: passHash
+    });
   } catch (error) {
     res.status(500).json({ error: "Error al crear el usuario" });
   }
@@ -109,3 +117,4 @@ router.delete("/:id", async (req, res) => {
 });
 
 export default router;
+

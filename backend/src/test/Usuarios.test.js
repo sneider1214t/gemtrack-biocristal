@@ -1,31 +1,24 @@
-// src/test/Usuarios.test.js
 import request from 'supertest';
 import app from '../../index.js';
-import { hash } from '../config/encrypting.js';
 
 describe('👤 API /api/usuarios - Biocristal', () => {
   const documentoTest = 1234567890;
 
-  // Se preparan las variables para los usuarios ya hasheadas
-  let usuarioNuevo;
-  let usuarioActualizado;
+  // Usuario sin hashear (la API lo hashea internamente)
+  const usuarioNuevo = {
+    documento_usuario: documentoTest,
+    nombre_usuario: 'Juan Pérez',
+    email_usuario: 'juan.perez@example.com',
+    rol_usuario: 1,
+    contraseña_usuario: 'securepass123' // ⚠️ sin hashear
+  };
 
-  beforeAll(async () => {
-    usuarioNuevo = {
-      documento_usuario: documentoTest,
-      nombre_usuario: 'Juan Pérez',
-      email_usuario: 'juan.perez@example.com',
-      rol_usuario: 1,
-      contraseña_usuario: await hash('securepass123') // 👈 contraseña hasheada
-    };
-
-    usuarioActualizado = {
-      nombre_usuario: 'Juan P. Gómez',
-      email_usuario: 'juan.gomez@example.com',
-      rol_usuario: 2,
-      contraseña_usuario: await hash('newpass456') // 👈 nueva contraseña hasheada
-    };
-  });
+  const usuarioActualizado = {
+    nombre_usuario: 'Juan P. Gómez',
+    email_usuario: 'juan.gomez@example.com',
+    rol_usuario: 2,
+    contraseña_usuario: 'newpass456' // ⚠️ sin hashear
+  };
 
   it('📥 Crear usuario', async () => {
     const res = await request(app)
@@ -34,7 +27,11 @@ describe('👤 API /api/usuarios - Biocristal', () => {
       .expect(201);
 
     console.log('✅ Usuario creado:', res.body);
-    expect(res.body.message).toBe('Usuario creado correctamente');
+    expect(res.body.documento_usuario).toBe(usuarioNuevo.documento_usuario);
+    expect(res.body.nombre_usuario).toBe(usuarioNuevo.nombre_usuario);
+    expect(res.body.email_usuario).toBe(usuarioNuevo.email_usuario);
+    expect(res.body.rol_usuario).toBe(usuarioNuevo.rol_usuario);
+    expect(typeof res.body.contraseña_usuario).toBe('string'); // Es un hash
   });
 
   it('📚 Obtener todos los usuarios', async () => {

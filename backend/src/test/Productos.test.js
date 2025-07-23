@@ -30,7 +30,7 @@ describe('🧱 API /api/productos - Biocristal', () => {
       .expect(201); // 201 Created
 
     console.log('✅ Producto creado:', res.body);
-    expect(res.body.message).toBe('Producto creado correctamente');
+    expect(res.body.codigo_producto).toBe(productoNuevo.codigo_producto);
   });
 
   it('📋 Obtener todos los productos', async () => {
