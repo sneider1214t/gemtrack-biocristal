@@ -1,14 +1,14 @@
 import request from 'supertest';
-import app from '../../index.js'; // ✅ Asegúrate de que esté correctamente importado
+import app from '../../index.js'; 
 
 describe('📍 API /api/ubicacion - Biocristal', () => {
   const ubicacionNueva = {
     nombre_ubicacion: 'BodegaTest',
-    estado_ubicacion: 1
+    estado_ubicacion: 'Ocupada' // texto permitido
   };
 
   const ubicacionActualizada = {
-    estado_ubicacion: 0
+    estado_ubicacion: 'Con espacio' // Texto permitido
   };
 
   // 📦 Crear ubicación
@@ -20,6 +20,7 @@ describe('📍 API /api/ubicacion - Biocristal', () => {
 
     console.log('✅ Ubicación creada:', res.body);
     expect(res.body.nombre_ubicacion).toBe(ubicacionNueva.nombre_ubicacion);
+    expect(res.body.estado_ubicacion).toBe('Ocupada');
   });
 
   // 📋 Obtener todas las ubicaciones
@@ -30,6 +31,7 @@ describe('📍 API /api/ubicacion - Biocristal', () => {
 
     console.log('📚 Todas las ubicaciones:', res.body);
     expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.some(u => u.estado_ubicacion === 'Ocupada' || u.estado_ubicacion === 'Con espacio')).toBe(true);
   });
 
   // 🔍 Obtener ubicación por nombre
@@ -40,6 +42,7 @@ describe('📍 API /api/ubicacion - Biocristal', () => {
 
     console.log('🔎 Ubicación encontrada:', res.body);
     expect(res.body.nombre_ubicacion).toBe(ubicacionNueva.nombre_ubicacion);
+    expect(res.body.estado_ubicacion).toBe('Ocupada');
   });
 
   // ✏️ Actualizar ubicación
@@ -60,7 +63,7 @@ describe('📍 API /api/ubicacion - Biocristal', () => {
       .expect(200);
 
     console.log('📌 Ubicación actualizada:', res.body);
-    expect(res.body.estado_ubicacion).toBe(ubicacionActualizada.estado_ubicacion);
+    expect(res.body.estado_ubicacion).toBe('Con espacio');
   });
 
   // 🗑️ Eliminar ubicación
@@ -75,7 +78,7 @@ describe('📍 API /api/ubicacion - Biocristal', () => {
 
   // ❌ Confirmar eliminación
   it('❌ Confirmar ubicación eliminada', async () => {
-    const res = await request(app)
+    await request(app)
       .get(`/api/ubicacion/${ubicacionNueva.nombre_ubicacion}`)
       .expect(404);
 
