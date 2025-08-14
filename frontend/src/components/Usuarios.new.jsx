@@ -26,108 +26,53 @@ function Usuarios() {
   });
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
-  // Obtener token y rol del localStorage
+  // Obtener token del localStorage
   const token = localStorage.getItem('token');
   const userRole = localStorage.getItem('userRole');
 
-  // Configurar interceptor para incluir el token en las peticiones
-  useEffect(() => {
-    const interceptor = api.interceptors.request.use(config => {
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
-    });
-
-    return () => {
-      // Limpiar interceptor al desmontar el componente
-      api.interceptors.request.eject(interceptor);
-    };
-  }, [token]);
+  // Configurar axios para incluir el token en las peticiones
+  api.interceptors.request.use(config => {
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
 
   // Cargar usuarios
   const fetchUsers = async () => {
-    console.log("Iniciando fetchUsers...");
-    console.log("Token:", token ? "Presente" : "Ausente");
-    console.log("Rol de usuario:", userRole);
-    
     try {
-      setLoading(true);
-      console.log("Haciendo petición a /api/usuarios...");
       const response = await api.get("/usuarios");
-      console.log("Respuesta recibida:", response);
-      
-      if (response.data) {
-        console.log("Usuarios recibidos:", response.data);
-        setUsers(response.data);
-        setError(null);
-      } else {
-        console.error("La respuesta no contiene datos");
-        setError("No se recibieron datos de usuarios");
-        toast.error("No se pudieron cargar los usuarios. Inténtalo de nuevo más tarde.");
-      }
+      setUsers(response.data);
+      setLoading(false);
     } catch (error) {
       console.error("Error al cargar usuarios:", error);
-      console.error("Detalles del error:", {
-        message: error.message,
-        response: error.response,
-        request: error.request,
-        config: error.config
-      });
-      
-      const errorMessage = error.response?.data?.message || "Error al cargar los usuarios";
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
+      setError("Error al cargar los usuarios");
       setLoading(false);
+      toast.error(error.response?.data?.message || "Error al cargar los usuarios");
     }
   };
 
-  // Cargar usuarios al montar el componente si es administrador
   useEffect(() => {
-    console.log("Efecto ejecutándose. Rol:", userRole);
     if (userRole === 'administrador') {
-      console.log("Iniciando carga de usuarios...");
       fetchUsers();
-    } else {
-      console.log("Usuario no es administrador. No se cargarán los usuarios.");
-      setLoading(false);
     }
   }, [userRole]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [name]: value
-    }));
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validar campos requeridos
-    if (!formData.nombre_usuario || !formData.email_usuario || (!editingUser && !formData.contraseña_usuario)) {
-      toast.error("Por favor completa todos los campos requeridos");
-      return;
-    }
-
-    // Validar formato de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email_usuario)) {
-      toast.error("Por favor ingresa un correo electrónico válido");
-      return;
-    }
-    
     try {
       if (editingUser) {
         // Actualizar usuario existente
-        const dataToUpdate = { ...formData };
-        // No actualizar la contraseña si está vacía
-        if (!dataToUpdate.contraseña_usuario) {
-          delete dataToUpdate.contraseña_usuario;
-        }
-        await api.put(`/usuarios/${editingUser.id_usuario}`, dataToUpdate);
+        await api.put(`/usuarios/${editingUser.id_usuario}`, formData);
         toast.success("Usuario actualizado correctamente");
       } else {
         // Crear nuevo usuario
@@ -135,8 +80,10 @@ function Usuarios() {
         toast.success("Usuario creado correctamente");
       }
       
-      // Recargar lista de usuarios y limpiar formulario
+      // Recargar lista de usuarios
       await fetchUsers();
+      
+      // Limpiar formulario
       setFormData({
         nombre_usuario: "",
         email_usuario: "",
@@ -146,30 +93,28 @@ function Usuarios() {
         direccion_usuario: "",
         estado_usuario: 1
       });
+      
       setEditingUser(null);
       setMostrarFormulario(false);
       
     } catch (error) {
       console.error("Error al guardar usuario:", error);
-      const errorMessage = error.response?.data?.message || "Error al guardar el usuario";
-      toast.error(errorMessage.includes("duplicate") ? "El correo electrónico ya está en uso" : errorMessage);
+      toast.error(error.response?.data?.message || "Error al guardar el usuario");
     }
   };
 
   const handleEdit = (user) => {
     setEditingUser(user);
     setFormData({
-      nombre_usuario: user.nombre_usuario || "",
-      email_usuario: user.email_usuario || "",
+      nombre_usuario: user.nombre_usuario,
+      email_usuario: user.email_usuario,
       contraseña_usuario: "", // No mostramos la contraseña por seguridad
-      rol_usuario: user.rol_usuario || "empleado",
+      rol_usuario: user.rol_usuario,
       telefono_usuario: user.telefono_usuario || "",
       direccion_usuario: user.direccion_usuario || "",
-      estado_usuario: user.estado_usuario || 1
+      estado_usuario: user.estado_usuario
     });
     setMostrarFormulario(true);
-    // Desplazarse al formulario
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
@@ -201,41 +146,17 @@ function Usuarios() {
 
   if (loading) {
     return (
-      <div className="w-full min-h-screen bg-background text-white p-8">
-        <div className="flex flex-col items-center justify-center min-h-[50vh]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-          <p className="text-lg">Cargando usuarios...</p>
-          <p className="text-sm text-gray-400 mt-2">Por favor, espera un momento</p>
-        </div>
-      </div>
-    );
-  }
-  
-  if (error) {
-    return (
-      <div className="w-full min-h-screen bg-background text-white p-8">
-        <div className="bg-red-500/20 border border-red-500 text-red-200 p-6 rounded-lg">
-          <h3 className="text-xl font-bold mb-2">Error al cargar los usuarios</h3>
-          <p className="mb-4">{error}</p>
-          <button 
-            onClick={fetchUsers}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white"
-          >
-            Reintentar
-          </button>
-        </div>
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
 
-  // Si el usuario no es administrador, mostrar mensaje
-  if (userRole !== 'administrador') {
+  if (error) {
     return (
       <div className="w-full min-h-screen bg-background text-white p-8">
-        <div className="max-w-2xl mx-auto mt-20 p-6 bg-yellow-900/30 border border-yellow-700 rounded-lg">
-          <h2 className="text-2xl font-bold text-yellow-400 mb-4">Acceso restringido</h2>
-          <p className="mb-4">No tienes permisos para acceder a esta sección.</p>
-          <p className="text-sm text-gray-400">Contacta a un administrador si necesitas acceso.</p>
+        <div className="bg-red-500 text-white p-4 rounded-lg">
+          {error}
         </div>
       </div>
     );
