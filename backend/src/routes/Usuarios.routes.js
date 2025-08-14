@@ -1,13 +1,90 @@
 import { Router } from "express";
 import { pool } from "../config/db.js";
-import { hash } from "../config/encrypting.js";
+import { hash, compare } from "../config/encrypting.js";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
 const router = Router();
+
+// Middleware para verificar token JWT
+const verifyToken = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    req.userId = decoded.id;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+};
+
+/* ------------------- Autenticación ------------------- */
+
+// Iniciar sesión
+router.post("/login", async (req, res) => {
+  const { email_usuario, contraseña_usuario } = req.body;
+
+  if (!email_usuario || !contraseña_usuario) {
+    return res.status(400).json({ message: 'Correo y contraseña son requeridos' });
+  }
+
+  try {
+    // Buscar usuario por email
+    const [users] = await pool.query(
+      "SELECT * FROM Usuarios WHERE email_usuario = ?",
+      [email_usuario]
+    );
+
+    const user = users[0];
+    
+    // Verificar si el usuario existe
+    if (!user) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+
+    // Verificar contraseña
+    const isPasswordValid = await compare(contraseña_usuario, user.contraseña_usuario);
+    
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
+
+    // Crear token JWT
+    const token = jwt.sign(
+      { 
+        id: user.documento_usuario,
+        rol: user.rol_usuario 
+      },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '8h' }
+    );
+
+    // Enviar respuesta exitosa
+    res.json({
+      message: 'Inicio de sesión exitoso',
+      token,
+      user: {
+        documento: user.documento_usuario,
+        nombre: user.nombre_usuario,
+        email: user.email_usuario,
+        rol: user.rol_usuario
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en login:', error);
+    res.status(500).json({ message: 'Error al iniciar sesión' });
+  }
+});
 
 /* ------------------- CRUD Usuarios ------------------- */
 
