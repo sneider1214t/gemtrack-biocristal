@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Sistema de gestión de Biocristal - Interfaz futurista" />
+    <title>Biocristal System</title>
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/src/styles/futurista.css">
+    <script type="module" crossorigin src="/gemtrack-biocristal/assets/index-D3Mg8j8Y.js"></script>
+    <link rel="stylesheet" crossorigin href="/gemtrack-biocristal/assets/index-B88BMpQV.css">
+  </head>
+  <body>
+    <div id="root">
+      <!-- Login Container -->
+      <div class="login-container">
+        <h1 class="login-title glow">BIOCRISTAL</h1>
+        <input type="text" class="login-input" placeholder="Usuario">
+        <input type="password" class="login-input" placeholder="Contraseña">
+        <button class="login-button">Entrar al Sistema</button>
+      </div>
+
+      <!-- Sistema Container -->
+      <div class="system-container" style="display: none;">
+        <h1 class="neon">Bienvenido al Sistema de Biocristal</h1>
+        <div class="menu-container">
+          <div class="menu-item">Dashboard</div>
+          <div class="menu-item">Inventario</div>
+          <div class="menu-item">Pedidos</div>
+          <div class="menu-item">Clientes</div>
+          <div class="menu-item">Reportes</div>
+        </div>
+        
+        <!-- Cart Form -->
+        <div class="cart-form">
+          <h2 class="neon">Carrito de Compras</h2>
+          <div class="cart-item">
+            <span>Producto</span>
+            <span>Cantidad</span>
+            <span>Precio</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

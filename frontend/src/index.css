@@ -1,0 +1,710 @@
+:root {
+  --primary-color: #2d2d2d;
+  --secondary-color: #1a1a1a;
+  --background-dark: #000000;
+  --background-light: #000000;
+  --text-color: #ffffff;
+  --neon-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  --gradient-start: #2d2d2d;
+  --gradient-end: #1a1a1a;
+  --red-pulse: #000000;
+  --red-light: #000000;
+}
+
+/* Animación de pulso morado */
+@keyframes bluePulse {
+  0% {
+    background: linear-gradient(135deg, var(--blue-pulse), var(--blue-light));
+    box-shadow: 0 0 20px var(--blue-pulse);
+    transform: scale(1);
+  }
+  50% {
+    background: linear-gradient(135deg, var(--blue-light), var(--blue-pulse));
+    box-shadow: 0 0 50px var(--blue-pulse);
+    transform: scale(1.05);
+  }
+  100% {
+    background: linear-gradient(135deg, var(--blue-pulse), var(--blue-light));
+    box-shadow: 0 0 20px var(--blue-pulse);
+    transform: scale(1);
+  }
+}
+
+@keyframes textPulse {
+  0% {
+    color: var(--blue-pulse);
+    text-shadow: 0 0 10px var(--blue-pulse);
+  }
+  50% {
+    color: var(--blue-light);
+    text-shadow: 0 0 20px var(--blue-light);
+  }
+  100% {
+    color: var(--blue-pulse);
+    text-shadow: 0 0 10px var(--blue-pulse);
+  }
+}
+
+/* Animación de brillo para botones */
+@keyframes buttonGlow {
+  0% {
+    box-shadow: 0 0 20px rgba(0, 0, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(0, 0, 255, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0, 0, 255, 0.2);
+  }
+}
+
+/* Animación de bienvenida */
+@keyframes welcomeAnim {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.4);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+  }
+}
+
+.welcome-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(30px);
+  box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.1);
+  text-align: center;
+  z-index: 1000;
+  animation: welcomeAnim 3s forwards;
+  border-radius: 20px;
+  padding: 2rem;
+}
+
+.welcome-message h1 {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  animation: textPulse 2s infinite;
+  color: var(--purple-pulse);
+  text-shadow: 0 0 20px var(--purple-pulse);
+}
+
+.welcome-message p {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  animation: textPulse 2s infinite;
+  color: var(--purple-light);
+  text-shadow: 0 0 10px var(--purple-light);
+}
+
+/* Botones */
+.login-button {
+  background: linear-gradient(135deg, var(--purple-pulse), var(--purple-light));
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 1.2rem;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  animation: purplePulse 2s infinite;
+}
+
+.login-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+  background: linear-gradient(135deg, var(--purple-light), var(--purple-pulse));
+}
+
+/* Campos de entrada */
+.login-input input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.login-input input:focus {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: white;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.login-input label {
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+  animation: textPulse 2s infinite;
+}
+
+.login-input input:not(:placeholder-shown) + label {
+  color: var(--purple-pulse);
+  transform: translateY(-10px);
+}
+
+.login-input .glass.bg-card {
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: fixed;
+  top: 4rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.glass-card:hover {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Componentes generales */
+.neon-text {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos del menú */
+.menu-item {
+  padding: 1rem;
+  color: #ffffff;
+  background: #000000;
+  border-radius: 8px;
+  margin: 0.5rem;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.menu-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, var(--red-pulse), var(--red-light));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.menu-item:hover::before {
+  opacity: 1;
+}
+
+.menu-item.active::before {
+  opacity: 1;
+}
+
+.menu-item:hover {
+  background-color: white;
+  color: black;
+  transform: scale(1.02);
+}
+
+.menu-item.active {
+  background: rgb(255, 253, 253);
+  transform: scale(1.02);
+}
+
+/* Opciones internas del menú */
+.menu-item ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  background: #000000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.menu-item ul li {
+  padding: 0.75rem 1rem;
+  color: #ffffff;
+  margin: 0.25rem 0;
+  border-radius: 6px;
+  background: #000000;
+  cursor: pointer;
+  border: 1px solid rgb(255, 255, 255);
+  transition: all 0.3s ease;
+}
+
+.menu-item ul li:hover {
+  background: rgb(255, 254, 254);
+  transform: scale(1.02);
+}
+
+.menu-item ul li.active {
+  background: rgb(255, 255, 255);
+  transform: scale(1.02);
+}
+
+/* Estilos del contenedor del menú */
+.glass-card {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgb(255, 255, 255);
+  box-shadow: 0 4px 6px rgb(255, 255, 255);
+}
+
+/* Estilo del título del menú */
+.text-3xl {
+  color: var(--red-pulse);
+  text-shadow: 0 0 10px var(--red-light);
+}
+
+/* Estilo de las secciones del menú */
+.mb-4 {
+  border-bottom: 2px solid rgba(0, 60, 255, 0.1);
+  padding-bottom: 1rem;
+}
+
+/* Estilo de los iconos */
+.ChevronDown, .ChevronRight {
+  color: #ffffff;
+  transition: none;
+}
+
+.menu-item:hover .ChevronDown, .menu-item:hover .ChevronRight {
+  transform: none;
+}
+
+.menu-item.active {
+  background: #000000;
+  color: #ffffff;
+}
+
+.menu-item ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  background: #000000;
+  border-radius: 8px;
+}
+
+.menu-item ul li {
+  padding: 0.75rem 1rem;
+  color: #ffffff;
+  margin: 0.25rem 0;
+  border-radius: 6px;
+  background: #000000;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.menu-item ul li:hover {
+  background: #000000;
+  color: #ffffff;
+}
+
+.menu-item ul li.active {
+  background: #000000;
+  color: #ffffff;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px var(--purple-pulse);
+  animation: purplePulse 2s infinite;
+}
+
+/* Botones */
+.login-button {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 1.2rem;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  animation: pulse 2s infinite;
+}
+
+.login-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
+  background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+}
+
+/* Campos de entrada */
+.login-input input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.login-input input:focus {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: white;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.login-input label {
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s ease;
+}
+
+.login-input input:focus + label,
+.login-input input:not(:placeholder-shown) + label {
+  color: white;
+  transform: translateY(-10px);
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  color: var(--text-color);
+  font-family: 'Arial', sans-serif;
+}
+
+/* Animaciones */
+@keyframes neonPulse {
+  0% { text-shadow: var(--neon-shadow); }
+  50% { text-shadow: 0 0 20px rgba(89, 0, 255, 0.8); }
+  100% { text-shadow: var(--neon-shadow); }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Animación de bienvenida */
+@keyframes welcomeAnim {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+}
+
+.welcome-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(26, 26, 26, 0.8);
+  padding: 2rem;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(0, 26, 255, 0.2);
+  text-align: center;
+  z-index: 1000;
+}
+
+.welcome-message h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: neonPulse 2s infinite;
+}
+
+.welcome-message p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  animation: fadeIn 1s ease-out;
+}
+
+/* Contenedor centralizado */
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.login-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(16, 16, 16, 0.95);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.5s ease-out;
+}
+
+/* Animaciones para el login */
+.login-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--background-dark), var(--background-light));
+  z-index: -1;
+}
+
+.login-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(16, 16, 16, 0.95);
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.5s ease-out;
+}
+
+.login-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-input {
+  position: relative;
+  width: 100%;
+}
+
+.login-input input {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.login-input input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom-color: var(--primary-color);
+}
+
+.login-input label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.login-input input:focus + label,
+.login-input input:not(:placeholder-shown) + label {
+  top: 0;
+  font-size: 0.8rem;
+  color: var(--primary-color);
+}
+
+.login-button {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(47, 0, 255, 0.3);
+}
+
+.forgot-password {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+  color: var(--primary-color);
+}
+
+/* Componentes generales */
+.neon-text {
+  text-shadow: var(--neon-shadow);
+  animation: neonPulse 2s infinite;
+}
+
+.glass-card {
+  background: rgba(26, 26, 26, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(0, 4, 255, 0.2);
+}
+
+.hover-glow {
+  transition: none;
+}
+
+.hover-glow:hover {
+  box-shadow: none;
+  transform: none;
+}
+
+/* Botones futuristas */
+.btn-futuristic {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-futuristic:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 17, 255, 0.3);
+}
+
+/* Formularios */
+.form-control {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(38, 0, 255, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Tablas */
+.table-futuristic {
+  background: rgba(26, 26, 26, 0.9);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.table-futuristic th {
+  background: rgba(47, 0, 255, 0.1);
+  color: var(--primary-color);
+  padding: 12px;
+  border-bottom: 1px solid rgba(0, 26, 255, 0.2);
+}
+
+.table-futuristic td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(0, 26, 255, 0.1);
+}
+
+/* Menús */
+.menu-item {
+  padding: 12px 20px;
+  margin: 8px 0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: rgb(0, 0, 0);
+}
+
+.menu-item:hover {
+  background: rgb(255, 255, 255);
+  transform: translateX(-5px);
+}
+
+/* Tarjetas de producto */
+.product-card {
+  background: rgba(26, 26, 26, 0.9);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 10px;
+  box-shadow: 0 0 20px rgb(0, 174, 255);
+  transition: all 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgb(0, 60, 255);
+}
