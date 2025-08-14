@@ -36,6 +36,7 @@ import Recordatorios from "./components/Recordatorios";
 import OrdenesCompra from "./components/OrdenesCompra";
 import Providers from "./components/Providers";
 import HistorialVentas from "./components/HistorialVentas";
+import Restablecer from "./components/Restablecer";
 
 
 
@@ -58,6 +59,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/recuperar" element={<Recuperar />} />
         <Route path="/inicio" element={<ProtectedRoute>{withLayout(Dashboard)}</ProtectedRoute>} />
+        <Route path="/reset-password/:token" element={<Restablecer />} />
 
         {/* Rutas protegidas con layout */}
         <Route path="/dashboard" element={

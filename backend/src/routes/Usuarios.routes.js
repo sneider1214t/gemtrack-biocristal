@@ -167,32 +167,40 @@ router.post("/", async (req, res) => {
 
 // Actualizar usuario
 router.put("/:id", async (req, res) => {
-  const { nombre_usuario, email_usuario, rol_usuario, contraseña_usuario } =
-    req.body;
+  const { nombre_usuario, email_usuario, rol_usuario, contraseña_usuario } = req.body;
   const { id } = req.params;
 
   const rolesPermitidos = ["Administrador", "Empleado"];
-
   if (!rolesPermitidos.includes(rol_usuario)) {
-    return res.status(400).json({
-      error: "El rol debe ser Administrador o Empleado",
-    });
+    return res.status(400).json({ error: "El rol debe ser Administrador o Empleado" });
   }
 
   try {
-    const [result] = await pool.query(
-      "UPDATE Usuarios SET nombre_usuario = ?, email_usuario = ?, rol_usuario = ?, contraseña_usuario = ? WHERE documento_usuario = ?",
-      [nombre_usuario, email_usuario, rol_usuario, contraseña_usuario, id]
-    );
+    let query = "UPDATE Usuarios SET nombre_usuario = ?, email_usuario = ?, rol_usuario = ?";
+    const params = [nombre_usuario, email_usuario, rol_usuario];
 
-    if (result.affectedRows === 0)
+    if (contraseña_usuario && contraseña_usuario.trim() !== "") {
+      const passHash = await hash(contraseña_usuario);
+      query += ", contraseña_usuario = ?";
+      params.push(passHash);
+    }
+
+    query += " WHERE documento_usuario = ?";
+    params.push(id);
+
+    const [result] = await pool.query(query, params);
+
+    if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Usuario no encontrado" });
+    }
 
     res.json({ message: "Usuario actualizado correctamente" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Error al actualizar el usuario" });
   }
 });
+
 
 // Eliminar usuario
 router.delete("/:id", async (req, res) => {

@@ -5,9 +5,7 @@ import { toast } from "react-toastify";
 // Configuración de axios para la API
 const api = axios.create({
   baseURL: "http://localhost:3000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
 });
 
 function Usuarios() {
@@ -15,190 +13,148 @@ function Usuarios() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+
   const [formData, setFormData] = useState({
+    documento_usuario: "",
     nombre_usuario: "",
     email_usuario: "",
     contraseña_usuario: "",
-    rol_usuario: "empleado",
-    telefono_usuario: "",
-    direccion_usuario: "",
-    estado_usuario: 1
+    rol_usuario: "Empleado", // Debe coincidir con API: "Administrador" | "Empleado"
   });
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
-  // Obtener token y rol del localStorage
-  const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const userRole = user.rol || '';
-  
-  console.log('Datos de usuario del localStorage:', { user, userRole });
+  // Token y rol desde localStorage
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const isAdmin =
+    typeof user?.rol === "string" &&
+    user.rol.toLowerCase() === "administrador";
 
-  // Configurar interceptor para incluir el token en las peticiones
+  // Interceptor para token
   useEffect(() => {
-    const interceptor = api.interceptors.request.use(config => {
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    const interceptor = api.interceptors.request.use((config) => {
+      if (token) config.headers.Authorization = `Bearer ${token}`;
       return config;
     });
-
-    return () => {
-      // Limpiar interceptor al desmontar el componente
-      api.interceptors.request.eject(interceptor);
-    };
+    return () => api.interceptors.request.eject(interceptor);
   }, [token]);
 
-  // Cargar usuarios
   const fetchUsers = async () => {
-    console.log("Iniciando fetchUsers...");
-    console.log("Token:", token ? "Presente" : "Ausente");
-    console.log("Rol de usuario:", userRole);
-    
     try {
       setLoading(true);
-      console.log("Haciendo petición a /api/usuarios...");
-      const response = await api.get("/usuarios");
-      console.log("Respuesta recibida:", response);
-      
-      if (response.data) {
-        console.log("Usuarios recibidos:", response.data);
-        setUsers(response.data);
-        setError(null);
-      } else {
-        console.error("La respuesta no contiene datos");
-        setError("No se recibieron datos de usuarios");
-        toast.error("No se pudieron cargar los usuarios. Inténtalo de nuevo más tarde.");
-      }
-    } catch (error) {
-      console.error("Error al cargar usuarios:", error);
-      console.error("Detalles del error:", {
-        message: error.message,
-        response: error.response,
-        request: error.request,
-        config: error.config
-      });
-      
-      const errorMessage = error.response?.data?.message || "Error al cargar los usuarios";
-      setError(errorMessage);
-      toast.error(errorMessage);
+      const { data } = await api.get("/usuarios");
+      setUsers(Array.isArray(data) ? data : []);
+      setError(null);
+    } catch (err) {
+      const msg = err.response?.data?.message || "Error al cargar los usuarios";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
   };
 
-  // Cargar usuarios al montar el componente si es administrador
+  // Cargar si es admin
   useEffect(() => {
-    console.log("Efecto ejecutándose. Rol:", userRole);
-    if (userRole && userRole.toLowerCase() === 'administrador') {
-      console.log("Iniciando carga de usuarios...");
-      fetchUsers();
-    } else {
-      console.log("Usuario no es administrador. No se cargarán los usuarios.");
-      setLoading(false);
-    }
-  }, [userRole]);
+    if (isAdmin) fetchUsers();
+    else setLoading(false);
+  }, [isAdmin]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const resetForm = () => {
+    setFormData({
+      documento_usuario: "",
+      nombre_usuario: "",
+      email_usuario: "",
+      contraseña_usuario: "",
+      rol_usuario: "Empleado",
+    });
+    setEditingUser(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validar campos requeridos
-    if (!formData.nombre_usuario || !formData.email_usuario || (!editingUser && !formData.contraseña_usuario)) {
-      toast.error("Por favor completa todos los campos requeridos");
+
+    // Validaciones básicas
+    if (
+      !formData.documento_usuario &&
+      !editingUser // documento no es editable, pero sí requerido al crear
+    ) {
+      toast.error("Documento es requerido");
       return;
     }
-
-    // Validar formato de email
+    if (!formData.nombre_usuario || !formData.email_usuario) {
+      toast.error("Nombre y correo son requeridos");
+      return;
+    }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email_usuario)) {
-      toast.error("Por favor ingresa un correo electrónico válido");
+      toast.error("Correo inválido");
       return;
     }
-    
+    if (!editingUser && !formData.contraseña_usuario) {
+      toast.error("La contraseña es requerida al crear");
+      return;
+    }
+
     try {
       if (editingUser) {
-        // Actualizar usuario existente
-        const dataToUpdate = { ...formData };
-        // No actualizar la contraseña si está vacía
-        if (!dataToUpdate.contraseña_usuario) {
-          delete dataToUpdate.contraseña_usuario;
-        }
-        await api.put(`/usuarios/${editingUser.id_usuario}`, dataToUpdate);
-        toast.success("Usuario actualizado correctamente");
+        // Actualizar: no enviar contraseña si está vacía
+        const { contraseña_usuario, ...rest } = formData;
+        const payload = contraseña_usuario
+          ? { ...rest, contraseña_usuario }
+          : { ...rest };
+        await api.put(`/usuarios/${editingUser.documento_usuario}`, payload);
+        toast.success("Usuario actualizado");
       } else {
-        // Crear nuevo usuario
+        // Crear
         await api.post("/usuarios", formData);
-        toast.success("Usuario creado correctamente");
+        toast.success("Usuario creado");
       }
-      
-      // Recargar lista de usuarios y limpiar formulario
+
       await fetchUsers();
-      setFormData({
-        nombre_usuario: "",
-        email_usuario: "",
-        contraseña_usuario: "",
-        rol_usuario: "empleado",
-        telefono_usuario: "",
-        direccion_usuario: "",
-        estado_usuario: 1
-      });
-      setEditingUser(null);
+      resetForm();
       setMostrarFormulario(false);
-      
-    } catch (error) {
-      console.error("Error al guardar usuario:", error);
-      const errorMessage = error.response?.data?.message || "Error al guardar el usuario";
-      toast.error(errorMessage.includes("duplicate") ? "El correo electrónico ya está en uso" : errorMessage);
+    } catch (err) {
+      const m =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Error al guardar el usuario";
+      toast.error(m.includes("duplicate") ? "Correo ya está en uso" : m);
     }
   };
 
-  const handleEdit = (user) => {
-    setEditingUser(user);
+  const handleEdit = (u) => {
+    setEditingUser(u);
     setFormData({
-      nombre_usuario: user.nombre_usuario || "",
-      email_usuario: user.email_usuario || "",
-      contraseña_usuario: "", // No mostramos la contraseña por seguridad
-      rol_usuario: user.rol_usuario || "empleado",
-      telefono_usuario: user.telefono_usuario || "",
-      direccion_usuario: user.direccion_usuario || "",
-      estado_usuario: user.estado_usuario || 1
+      documento_usuario: u.documento_usuario || "",
+      nombre_usuario: u.nombre_usuario || "",
+      email_usuario: u.email_usuario || "",
+      contraseña_usuario: "",
+      rol_usuario: u.rol_usuario || "Empleado",
     });
     setMostrarFormulario(true);
-    // Desplazarse al formulario
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
+  const handleDelete = async (documento) => {
+    if (!documento) return;
+    if (window.confirm("¿Eliminar este usuario?")) {
       try {
-        await api.delete(`/usuarios/${id}`);
-        toast.success("Usuario eliminado correctamente");
+        await api.delete(`/usuarios/${documento}`);
+        toast.success("Usuario eliminado");
         await fetchUsers();
-      } catch (error) {
-        console.error("Error al eliminar usuario:", error);
-        toast.error(error.response?.data?.message || "Error al eliminar el usuario");
+      } catch (err) {
+        toast.error(
+          err.response?.data?.message ||
+            err.response?.data?.error ||
+            "Error al eliminar"
+        );
       }
-    }
-  };
-
-  const handleToggleStatus = async (user) => {
-    try {
-      await api.put(`/usuarios/${user.id_usuario}`, {
-        ...user,
-        estado_usuario: user.estado_usuario === 1 ? 0 : 1
-      });
-      toast.success(`Usuario ${user.estado_usuario === 1 ? 'deshabilitado' : 'habilitado'} correctamente`);
-      await fetchUsers();
-    } catch (error) {
-      console.error("Error al cambiar estado del usuario:", error);
-      toast.error(error.response?.data?.message || "Error al cambiar el estado del usuario");
     }
   };
 
@@ -208,19 +164,19 @@ function Usuarios() {
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
           <p className="text-lg">Cargando usuarios...</p>
-          <p className="text-sm text-gray-400 mt-2">Por favor, espera un momento</p>
+          <p className="text-sm text-gray-400 mt-2">Por favor, espera</p>
         </div>
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="w-full min-h-screen bg-background text-white p-8">
         <div className="bg-red-500/20 border border-red-500 text-red-200 p-6 rounded-lg">
-          <h3 className="text-xl font-bold mb-2">Error al cargar los usuarios</h3>
+          <h3 className="text-xl font-bold mb-2">Error al cargar</h3>
           <p className="mb-4">{error}</p>
-          <button 
+          <button
             onClick={fetchUsers}
             className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white"
           >
@@ -231,14 +187,17 @@ function Usuarios() {
     );
   }
 
-  // Si el usuario no es administrador, mostrar mensaje
-  if (!userRole || userRole.toLowerCase() !== 'administrador') {
+  if (!isAdmin) {
     return (
       <div className="w-full min-h-screen bg-background text-white p-8">
         <div className="max-w-2xl mx-auto mt-20 p-6 bg-yellow-900/30 border border-yellow-700 rounded-lg">
-          <h2 className="text-2xl font-bold text-yellow-400 mb-4">Acceso restringido</h2>
-          <p className="mb-4">No tienes permisos para acceder a esta sección.</p>
-          <p className="text-sm text-gray-400">Contacta a un administrador si necesitas acceso.</p>
+          <h2 className="text-2xl font-bold text-yellow-400 mb-4">
+            Acceso restringido
+          </h2>
+          <p className="mb-2">No tienes permisos para esta sección.</p>
+          <p className="text-sm text-gray-400">
+            Contacta a un administrador si necesitas acceso.
+          </p>
         </div>
       </div>
     );
@@ -248,38 +207,46 @@ function Usuarios() {
     <div className="w-full min-h-screen bg-background text-white p-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-accent">Gestión de Usuarios</h2>
-        {userRole === 'administrador' && (
-          <button
-            onClick={() => {
-              setEditingUser(null);
-              setFormData({
-                nombre_usuario: "",
-                email_usuario: "",
-                contraseña_usuario: "",
-                rol_usuario: "empleado",
-                telefono_usuario: "",
-                direccion_usuario: "",
-                estado_usuario: 1
-              });
-              setMostrarFormulario(!mostrarFormulario);
-            }}
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-semibold flex items-center space-x-2"
-          >
-            <span>➕</span>
-            <span>{editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}</span>
-          </button>
-        )}
+        <button
+          onClick={() => {
+            if (editingUser) setEditingUser(null);
+            resetForm();
+            setMostrarFormulario((s) => !s);
+          }}
+          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-semibold flex items-center space-x-2"
+        >
+          <span>➕</span>
+          <span>{editingUser ? "Editar Usuario" : "Nuevo Usuario"}</span>
+        </button>
       </div>
 
       {mostrarFormulario && (
         <div className="mb-8 bg-card p-6 rounded-lg shadow-lg">
           <h3 className="text-xl font-semibold mb-4">
-            {editingUser ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
+            {editingUser ? "Editar Usuario" : "Crear Nuevo Usuario"}
           </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {!editingUser && (
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Documento
+                  </label>
+                  <input
+                    type="text"
+                    name="documento_usuario"
+                    value={formData.documento_usuario}
+                    onChange={handleInputChange}
+                    className="w-full p-2 rounded bg-gray-700 text-white"
+                    required
+                  />
+                </div>
+              )}
+
               <div>
-                <label className="block text-sm font-medium mb-1">Nombre Completo</label>
+                <label className="block text-sm font-medium mb-1">
+                  Nombre Completo
+                </label>
                 <input
                   type="text"
                   name="nombre_usuario"
@@ -289,9 +256,11 @@ function Usuarios() {
                   required
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium mb-1">Correo Electrónico</label>
+                <label className="block text-sm font-medium mb-1">
+                  Correo Electrónico
+                </label>
                 <input
                   type="email"
                   name="email_usuario"
@@ -301,10 +270,10 @@ function Usuarios() {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Contraseña {editingUser && '(dejar en blanco para no cambiar)'}
+                  Contraseña {editingUser && "(dejar vacío para no cambiar)"}
                 </label>
                 <input
                   type="password"
@@ -315,7 +284,7 @@ function Usuarios() {
                   required={!editingUser}
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-1">Rol</label>
                 <select
@@ -325,49 +294,12 @@ function Usuarios() {
                   className="w-full p-2 rounded bg-gray-700 text-white"
                   required
                 >
-                  <option value="administrador">Administrador</option>
-                  <option value="empleado">Empleado</option>
+                  <option value="Administrador">Administrador</option>
+                  <option value="Empleado">Empleado</option>
                 </select>
               </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-1">Teléfono</label>
-                <input
-                  type="tel"
-                  name="telefono_usuario"
-                  value={formData.telefono_usuario}
-                  onChange={handleInputChange}
-                  className="w-full p-2 rounded bg-gray-700 text-white"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-1">Dirección</label>
-                <input
-                  type="text"
-                  name="direccion_usuario"
-                  value={formData.direccion_usuario}
-                  onChange={handleInputChange}
-                  className="w-full p-2 rounded bg-gray-700 text-white"
-                />
-              </div>
-              
-              {editingUser && (
-                <div>
-                  <label className="block text-sm font-medium mb-1">Estado</label>
-                  <select
-                    name="estado_usuario"
-                    value={formData.estado_usuario}
-                    onChange={handleInputChange}
-                    className="w-full p-2 rounded bg-gray-700 text-white"
-                  >
-                    <option value={1}>Activo</option>
-                    <option value={0}>Inactivo</option>
-                  </select>
-                </div>
-              )}
             </div>
-            
+
             <div className="flex justify-end space-x-2 pt-4">
               <button
                 type="button"
@@ -380,7 +312,7 @@ function Usuarios() {
                 type="submit"
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg"
               >
-                {editingUser ? 'Actualizar' : 'Crear'} Usuario
+                {editingUser ? "Actualizar" : "Crear"} Usuario
               </button>
             </div>
           </form>
@@ -391,74 +323,65 @@ function Usuarios() {
         <table className="min-w-full">
           <thead>
             <tr className="bg-gray-800">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nombre</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Email</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Rol</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Teléfono</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Estado</th>
-              {userRole === 'administrador' && (
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
-              )}
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Documento
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Nombre
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Email
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Rol
+              </th>
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
             {users.length > 0 ? (
-              users.map((user, index) => {
-                // Usar el índice como respaldo si el id_usuario no está definido
-                const uniqueId = user.id_usuario !== undefined ? user.id_usuario : `temp-${index}`;
-                return (
-                  <tr key={`user-${uniqueId}`} className="hover:bg-gray-800">
-                    <td className="px-6 py-4 whitespace-nowrap">{user.id_usuario || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{user.nombre_usuario || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{user.email_usuario || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap capitalize">{user.rol_usuario || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{user.telefono_usuario || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.estado_usuario === 1 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {user.estado_usuario === 1 ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </td>
-                    {userRole && userRole.toLowerCase() === 'administrador' && (
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end space-x-2">
-                          <button
-                            onClick={() => handleEdit(user)}
-                            className="text-blue-400 hover:text-blue-600"
-                            title="Editar"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            onClick={() => handleToggleStatus(user)}
-                            className={user.estado_usuario === 1 
-                              ? "text-yellow-400 hover:text-yellow-600" 
-                              : "text-green-400 hover:text-green-600"
-                            }
-                            title={user.estado_usuario === 1 ? 'Desactivar' : 'Activar'}
-                          >
-                            {user.estado_usuario === 1 ? '❌' : '✅'}
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user.id_usuario)}
-                            className="text-red-400 hover:text-red-600"
-                            title="Eliminar"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                );
-              })
+              users.map((u) => (
+                <tr
+                  key={`user-${u.documento_usuario}`}
+                  className="hover:bg-gray-800"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {u.documento_usuario || "-"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {u.nombre_usuario || "-"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {u.email_usuario || "-"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {u.rol_usuario || "-"}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex justify-end space-x-3">
+                      <button
+                        onClick={() => handleEdit(u)}
+                        className="text-blue-400 hover:text-blue-600"
+                        title="Editar"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => handleDelete(u.documento_usuario)}
+                        className="text-red-400 hover:text-red-600"
+                        title="Eliminar"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
             ) : (
               <tr>
-                <td colSpan={userRole === 'administrador' ? 7 : 6} className="px-6 py-4 text-center text-gray-400">
+                <td colSpan={5} className="px-6 py-4 text-center text-gray-400">
                   No hay usuarios registrados
                 </td>
               </tr>
@@ -466,12 +389,6 @@ function Usuarios() {
           </tbody>
         </table>
       </div>
-
-      {userRole !== 'administrador' && (
-        <div className="mt-8 p-4 bg-yellow-900 bg-opacity-30 rounded-lg text-yellow-200">
-          <p>No tienes permisos para administrar usuarios. Contacta a un administrador.</p>
-        </div>
-      )}
     </div>
   );
 }

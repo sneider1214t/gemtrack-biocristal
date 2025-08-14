@@ -88,7 +88,7 @@ function Dashboard() {
         </div>
 
         <div className="flex items-center gap-4">
-          {rol === "admin" && <AgregarProducto onAgregarProducto={agregarProducto} />}
+          {rol === "Administrador" && <AgregarProducto onAgregarProducto={agregarProducto} />}
 
           <div className="flex items-center gap-4">
             {/* Menú desplegable del perfil */}
@@ -98,10 +98,10 @@ function Dashboard() {
                   <div
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className={`relative w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md cursor-pointer transition-all duration-200 ${
-                      rol === "admin" ? "bg-blue-800 hover:bg-blue-900" : "bg-gray-600 hover:bg-gray-700"
+                      rol === "Administrador" ? "bg-blue-800 hover:bg-blue-900" : "bg-gray-600 hover:bg-gray-700"
                     }`}
                   >
-                    {rol === "admin" ? "ADM" : "TRB"}
+                    {rol === "Administrador" ? "ADM" : "EMP"}
                     <ChevronDown 
                       size={14} 
                       className={`ml-0.5 transition-transform duration-200 ${isProfileOpen ? 'transform rotate-180' : ''}`} 
@@ -112,8 +112,8 @@ function Dashboard() {
                   {isProfileOpen && (
                     <div className="absolute right-0 top-10 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50 overflow-hidden">
                       <div className="p-2 border-b border-gray-700">
-                        <p className="text-sm text-white font-medium">Usuario: Admin</p>
-                        <p className="text-xs text-gray-400">{rol === "admin" ? "Administrador" : "Trabajador"}</p>
+                        <p className="text-sm text-white font-medium">Usuario: </p>
+                        <p className="text-xs text-gray-400">{rol === "Administrador" ? "Administrador" : "Empleado"}</p>
                       </div>
                       <button
                         onClick={handleLogout}

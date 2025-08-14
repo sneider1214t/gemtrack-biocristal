@@ -6,10 +6,8 @@ import axios from "axios";
 
 // Configuración de axios para la API
 const api = axios.create({
-  baseURL: "http://localhost:3000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: "http://localhost:3000/api/usuarios", // <— AHORA apuntas al recurso usuarios
+  headers: { "Content-Type": "application/json" },
 });
 
 function Login() {
@@ -37,66 +35,51 @@ function Login() {
     }
 
     setIsLoading(true);
-    setError("");
+  setError("");
 
-    try {
-      // Llamar al endpoint de login
-      const response = await api.post("/usuarios/login", {
-        email_usuario: email,
-        contraseña_usuario: password
-      });
+  try {
+    // Llamar al endpoint correcto
+    const response = await api.post("/login", {
+      email_usuario: email,
+      contraseña_usuario: password,
+    });
 
-      const { token, user } = response.data;
-      
-      // Guardar token y datos del usuario
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("auth", "true");
-      localStorage.setItem("rol", user.rol);
-      
-      // Configurar el token en las cabeceras de axios
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      
-      // Mostrar mensaje de bienvenida
-      toast.success(`¡Bienvenido, ${user.nombre}!`);
-      
-      // Redirigir según el rol
-      if (user.rol === 'Administrador') {
-        navigate("/dashboard");
-      } else {
-        navigate("/ventas");
-      }
-      
-    } catch (error) {
-      console.error("Error de autenticación:", error);
-      
-      // Manejar diferentes tipos de errores
-      if (error.response) {
-        // Error de la API
-        const { status, data } = error.response;
-        
-        if (status === 400) {
-          setError(data.message || "Datos de inicio de sesión incorrectos");
-        } else if (status === 401) {
-          setError("Correo o contraseña incorrectos");
-        } else if (status >= 500) {
-          setError("Error en el servidor. Por favor, intente más tarde.");
-        } else {
-          setError("Error al iniciar sesión. Por favor, verifique sus datos.");
-        }
-      } else if (error.request) {
-        // Error de red
-        setError("No se pudo conectar al servidor. Verifique su conexión a internet.");
-      } else {
-        // Otros errores
-        setError("Ocurrió un error inesperado. Por favor, intente nuevamente.");
-      }
-      
-      // Mostrar error en la consola para depuración
-      console.error("Detalles del error:", error.message);
-    } finally {
-      setIsLoading(false);
+    const { token, user } = response.data; // user = { documento, nombre, email, rol }
+
+    // Guardar token y datos del usuario
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("auth", "true");
+    localStorage.setItem("rol", user.rol); // <— usa 'rol', no 'rol_usuario'
+
+    // Inyectar token en axios (opcional si tienes un interceptor global)
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    // Mensaje de bienvenida (usa 'nombre')
+    toast.success(`¡Bienvenido, ${user.nombre}!`);
+
+    // Redirigir (si necesitas separar por rol, compara con "Administrador")
+    if (user.rol === "Administrador") {
+      navigate("/dashboard");
+    } else {
+      navigate("/dashboard");
     }
+  } catch (error) {
+    console.error("Error de autenticación:", error);
+    if (error.response) {
+      const { status, data } = error.response;
+      if (status === 400) setError(data.message || "Datos de inicio de sesión incorrectos");
+      else if (status === 401) setError("Correo o contraseña incorrectos");
+      else if (status >= 500) setError("Error en el servidor. Por favor, intente más tarde.");
+      else setError("Error al iniciar sesión. Por favor, verifique sus datos.");
+    } else if (error.request) {
+      setError("No se pudo conectar al servidor. Verifique su conexión a internet.");
+    } else {
+      setError("Ocurrió un error inesperado. Por favor, intente nuevamente.");
+    }
+  } finally {
+    setIsLoading(false);
+  }
   };
 
   return (

@@ -1,44 +1,93 @@
 import { useState } from "react";
-import emailjs from "@emailjs/browser";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+
+// API alineada con tu backend (router montado en /api/usuarios)
+const api = axios.create({
+  baseURL: "http://localhost:3000/api/usuarios",
+  headers: { "Content-Type": "application/json" },
+});
 
 function Recuperar() {
-  const [correo, setCorreo] = useState("");
-  const [enviado, setEnviado] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleRecuperar = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    emailjs.send("TU_SERVICE_ID", "TU_TEMPLATE_ID", {
-      correo,
-    }, "TU_PUBLIC_KEY")
-      .then(() => {
-        setEnviado(true);
-        setTimeout(() => setEnviado(false), 4000);
-      })
-      .catch((err) => {
-        console.error("Error al enviar el correo:", err);
-      });
+    if (!email) return setError("Por favor ingrese su correo");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return setError("Correo electrónico inválido");
+
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Tu API: POST /forgot-password { email_usuario }
+      await api.post("/forgot-password", { email_usuario: email });
+
+      toast.success(
+        "Si el correo existe, te enviamos un enlace para restablecer tu contraseña."
+      );
+      navigate("/");
+    } catch (err) {
+      console.error("Error en recuperación:", err);
+      if (err.response?.status >= 500) {
+        setError("Error en el servidor. Intenta más tarde.");
+      } else {
+        // Por seguridad, tu API responde genérico: mantenemos mensaje amigable.
+        setError(
+          "Si el correo existe, te enviamos un enlace para restablecer tu contraseña."
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-background text-white">
-      <form onSubmit={handleRecuperar} className="bg-card p-6 rounded-2xl shadow-lg w-full max-w-md space-y-4">
-        <h2 className="text-2xl font-bold text-accent text-center">Recuperar Contraseña</h2>
-        <input
-          type="email"
-          placeholder="Correo registrado"
-          className="w-full p-2 rounded bg-slate-700 text-white"
-          value={correo}
-          onChange={(e) => setCorreo(e.target.value)}
-          required
-        />
-        <button type="submit" className="w-full bg-accent hover:bg-blue-700 py-2 rounded font-bold">
-          Enviar enlace
-        </button>
-        {enviado && <p className="text-purple-400 text-sm text-center mt-2">✅ ¡Correo enviado correctamente!</p>}
-      </form>
+    <div className="login-wrapper">
+      <div className="login-container">
+        <h1 className="login-title">
+          <span className="text-4xl">💎</span>
+          <span className="ml-2">BioCristal</span>
+        </h1>
+
+        <h2 className="text-center text-xl mb-2">Recuperar contraseña</h2>
+        <p className="text-center text-gray-300 mb-6">
+          Ingresa tu correo para enviarte un enlace de recuperación.
+        </p>
+
+        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="login-input">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <label>Correo Electrónico</label>
+          </div>
+
+          <button type="submit" className="login-button" disabled={isLoading}>
+            {isLoading ? "Enviando..." : "Enviar enlace"}
+          </button>
+        </form>
+
+        <div className="text-center mt-4">
+          <Link to="/" className="forgot-password">
+            ← Volver al inicio de sesión
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default Recuperar;
+
