@@ -28,7 +28,10 @@ function Usuarios() {
 
   // Obtener token y rol del localStorage
   const token = localStorage.getItem('token');
-  const userRole = localStorage.getItem('userRole');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRole = user.rol || '';
+  
+  console.log('Datos de usuario del localStorage:', { user, userRole });
 
   // Configurar interceptor para incluir el token en las peticiones
   useEffect(() => {
@@ -86,7 +89,7 @@ function Usuarios() {
   // Cargar usuarios al montar el componente si es administrador
   useEffect(() => {
     console.log("Efecto ejecutándose. Rol:", userRole);
-    if (userRole === 'administrador') {
+    if (userRole && userRole.toLowerCase() === 'administrador') {
       console.log("Iniciando carga de usuarios...");
       fetchUsers();
     } else {
@@ -229,7 +232,7 @@ function Usuarios() {
   }
 
   // Si el usuario no es administrador, mostrar mensaje
-  if (userRole !== 'administrador') {
+  if (!userRole || userRole.toLowerCase() !== 'administrador') {
     return (
       <div className="w-full min-h-screen bg-background text-white p-8">
         <div className="max-w-2xl mx-auto mt-20 p-6 bg-yellow-900/30 border border-yellow-700 rounded-lg">
@@ -401,54 +404,58 @@ function Usuarios() {
           </thead>
           <tbody className="divide-y divide-gray-700">
             {users.length > 0 ? (
-              users.map((user) => (
-                <tr key={user.id_usuario} className="hover:bg-gray-800">
-                  <td className="px-6 py-4 whitespace-nowrap">{user.id_usuario}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{user.nombre_usuario}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{user.email_usuario}</td>
-                  <td className="px-6 py-4 whitespace-nowrap capitalize">{user.rol_usuario}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{user.telefono_usuario || '-'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      user.estado_usuario === 1 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {user.estado_usuario === 1 ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  {userRole === 'administrador' && (
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => handleEdit(user)}
-                          className="text-blue-400 hover:text-blue-600"
-                          title="Editar"
-                        >
-                          ✏️
-                        </button>
-                        <button
-                          onClick={() => handleToggleStatus(user)}
-                          className={user.estado_usuario === 1 
-                            ? "text-yellow-400 hover:text-yellow-600" 
-                            : "text-green-400 hover:text-green-600"
-                          }
-                          title={user.estado_usuario === 1 ? 'Desactivar' : 'Activar'}
-                        >
-                          {user.estado_usuario === 1 ? '❌' : '✅'}
-                        </button>
-                        <button
-                          onClick={() => handleDelete(user.id_usuario)}
-                          className="text-red-400 hover:text-red-600"
-                          title="Eliminar"
-                        >
-                          🗑️
-                        </button>
-                      </div>
+              users.map((user, index) => {
+                // Usar el índice como respaldo si el id_usuario no está definido
+                const uniqueId = user.id_usuario !== undefined ? user.id_usuario : `temp-${index}`;
+                return (
+                  <tr key={`user-${uniqueId}`} className="hover:bg-gray-800">
+                    <td className="px-6 py-4 whitespace-nowrap">{user.id_usuario || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{user.nombre_usuario || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{user.email_usuario || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap capitalize">{user.rol_usuario || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{user.telefono_usuario || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        user.estado_usuario === 1 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {user.estado_usuario === 1 ? 'Activo' : 'Inactivo'}
+                      </span>
                     </td>
-                  )}
-                </tr>
-              ))
+                    {userRole && userRole.toLowerCase() === 'administrador' && (
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            onClick={() => handleEdit(user)}
+                            className="text-blue-400 hover:text-blue-600"
+                            title="Editar"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            onClick={() => handleToggleStatus(user)}
+                            className={user.estado_usuario === 1 
+                              ? "text-yellow-400 hover:text-yellow-600" 
+                              : "text-green-400 hover:text-green-600"
+                            }
+                            title={user.estado_usuario === 1 ? 'Desactivar' : 'Activar'}
+                          >
+                            {user.estado_usuario === 1 ? '❌' : '✅'}
+                          </button>
+                          <button
+                            onClick={() => handleDelete(user.id_usuario)}
+                            className="text-red-400 hover:text-red-600"
+                            title="Eliminar"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={userRole === 'administrador' ? 7 : 6} className="px-6 py-4 text-center text-gray-400">
