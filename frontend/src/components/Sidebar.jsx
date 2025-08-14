@@ -32,7 +32,6 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import Modal from "./Modal";
 import ObservacionesModal from "./ObservacionesModal";
 import NotificacionesModal from "./NotificacionesModal";
-import RegistroDevolucionGarantiaModal from "./RegistroDevolucionGarantiaModal";
 import RegistroTablasModal from "./RegistroTablasModal";
 import AlertasModal from "./AlertasModal";
 import ContabilidadModal from "./ContabilidadModal";
@@ -40,7 +39,6 @@ import CopiaSeguridadModal from "./CopiaSeguridadModal";
 import TiempoProductoModal from "./TiempoProductoModal";
 import DescargasModal from "./DescargasModal";
 import TiposModal from "./TiposModal";
-import NivelesStockModal from "./NivelesStockModal";
 import GenerarDocumentoModal from "./GenerarDocumentoModal";
 
 
@@ -390,11 +388,6 @@ function Sidebar() {
         onClose={() => handleCloseModal('observaciones')}
       />
 
-      <RegistroDevolucionGarantiaModal
-        isOpen={modalStates.registroDevolucion}
-        onClose={() => handleCloseModal('registroDevolucion')}
-      />
-
       <RegistroTablasModal
         isOpen={modalStates.registroTablas}
         onClose={() => handleCloseModal('registroTablas')}
@@ -430,10 +423,6 @@ function Sidebar() {
         onClose={() => handleCloseModal('tipos')}
       />
 
-      <NivelesStockModal
-        isOpen={modalStates.nivelesStock}
-        onClose={() => handleCloseModal('nivelesStock')}
-      />
 
       <GenerarDocumentoModal
         isOpen={modalStates.generarDocumento}
