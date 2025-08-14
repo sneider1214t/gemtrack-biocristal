@@ -15,7 +15,9 @@ import RegistroTablas from "./components/RegistroTablas";
 import DataManager from "./components/DataManager";
 import Recuperar from "./components/Recuperar";
 import Customers from "./components/Customers";
-import Ubicacion from "./components/Ubicacion";
+
+
+
 import Ingresos from "./components/Ingresos";
 import TipoMoneda from "./components/TipoMoneda";
 import HistorialCompras from "./components/HistorialCompras";
@@ -115,9 +117,6 @@ function App() {
         } />
         <Route path="/formulario" element={
           <ProtectedRoute>{withLayout(Formulario)}</ProtectedRoute>
-        } />
-        <Route path="/ubicacion" element={
-          <ProtectedRoute>{withLayout(Ubicacion)}</ProtectedRoute>
         } />
         <Route path="/ingresos" element={
           <ProtectedRoute>{withLayout(Ingresos)}</ProtectedRoute>

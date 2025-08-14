@@ -42,7 +42,9 @@ import DescargasModal from "./DescargasModal";
 import TiposModal from "./TiposModal";
 import NivelesStockModal from "./NivelesStockModal";
 import GenerarDocumentoModal from "./GenerarDocumentoModal";
-import UbicacionesAlmacenesModal from "./UbicacionesAlmacenesModal";
+
+
+
 import RecordatoriosModal from "./RecordatoriosModal";
 import OrdenesCompraModal from "./OrdenesCompraModal";
 
@@ -438,10 +440,6 @@ function Sidebar() {
         onClose={() => handleCloseModal('generarDocumento')}
       />
 
-      <UbicacionesAlmacenesModal
-        isOpen={modalStates.ubicacionesAlmacenes}
-        onClose={() => handleCloseModal('ubicacionesAlmacenes')}
-      />
 
       <RecordatoriosModal
         isOpen={modalStates.recordatorios}
