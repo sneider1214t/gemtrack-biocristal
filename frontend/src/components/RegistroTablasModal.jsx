@@ -11,7 +11,9 @@ function RegistroTablasModal({ isOpen, onClose }) {
         </button>
 
         <h2 className="text-2xl font-bold text-accent mb-2">📋 Registro de Tablas</h2>
-        <p className="text-muted mb-4">Visualiza o administra registros de tablas predefinidas del sistema.</p>
+        <p className="text-muted mb-4">
+          Visualiza o administra registros de tablas predefinidas del sistema.
+        </p>
 
         <div className="space-y-3">
           <div className="bg-background p-3 rounded-xl">

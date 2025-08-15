@@ -42,10 +42,6 @@ import TiposModal from "./TiposModal";
 import GenerarDocumentoModal from "./GenerarDocumentoModal";
 
 
-
-import RecordatoriosModal from "./RecordatoriosModal";
-import OrdenesCompraModal from "./OrdenesCompraModal";
-
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -430,15 +426,6 @@ function Sidebar() {
       />
 
 
-      <RecordatoriosModal
-        isOpen={modalStates.recordatorios}
-        onClose={() => handleCloseModal('recordatorios')}
-      />
-
-      <OrdenesCompraModal
-        isOpen={modalStates.ordenesCompra}
-        onClose={() => handleCloseModal('ordenesCompra')}
-      />
     </div>
   );
 }
