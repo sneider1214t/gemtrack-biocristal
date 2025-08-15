@@ -1,56 +1,58 @@
+// src/components/Dashboard.jsx
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, ShoppingCart, LogOut, ChevronDown } from "lucide-react";
+import { Search, X, ShoppingCart, LogOut, ChevronDown, CheckCircle2 } from "lucide-react";
 import Fuse from "fuse.js";
+import axios from "axios";
 import AgregarProducto from "./AgregarProducto";
 import GemCard from "./GemCard";
 import { useCart } from "../context/CartContext";
-
-const initialGemstones = [
-  { id: 1, name: "Rubí", stock: 12, descripcion: "Gema roja intensa.", precio: 100000, imagen: "/img/ruby.png", categoria: "normal" },
-  { id: 2, name: "Esmeralda", stock: 8, descripcion: "Verde y elegante.", precio: 120000, imagen: "/img/esmeralda.png", categoria: "normal" },
-  { id: 3, name: "Sapphire", stock: 23, descripcion: "Azul profundo.", precio: 90000, imagen: "/img/sapphire.png", categoria: "normal" },
-  { id: 4, name: "Amatista", stock: 4, descripcion: "Púrpura espiritual.", precio: 75000, imagen: "/img/amatista.png", categoria: "normal" },
-  { id: 5, name: "Diamante", stock: 30, descripcion: "Brillante y eterno.", precio: 150000, imagen: "/img/diamante.png", categoria: "exclusivo" },
-  { id: 6, name: "Citrinos", stock: 72, descripcion: "Amarillo radiante.", precio: 120000, imagen: "/img/citrinos.png", categoria: "exclusivo" },
-  { id: 7, name: "Kit Rubí + Zafiro", stock: 10, descripcion: "Combo especial.", precio: 200000, imagen: "/img/kit.png", categoria: "kit" },
-];
+import CheckoutForm from "./CheckoutForm";
 
 function Dashboard() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [gemstones, setGemstones] = useState(initialGemstones);
+  const [gemstones, setGemstones] = useState([]);
   const [rol, setRol] = useState(null);
   const [selectedGem, setSelectedGem] = useState(null);
   const [showCart, setShowCart] = useState(false);
-  const [showComparison, setShowComparison] = useState(false);
-  const [filtro, setFiltro] = useState("todos");
-  const [formData, setFormData] = useState({ nombre: "", correo: "", direccion: "", celular: "" });
-  const [mensajeEnviado, setMensajeEnviado] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { cart, clearCart, removeFromCart } = useCart();
-  
-  // Cerrar el menú desplegable al hacer clic fuera de él
+
+  // ✅ NUEVO: estado para mostrar el alert de “compra exitosa”
+  const [saleOk, setSaleOk] = useState(false);
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (event.target.closest('.profile-dropdown') === null) {
-        setIsProfileOpen(false);
+    if (!saleOk) return;
+    const t = setTimeout(() => setSaleOk(false), 4000);
+    return () => clearTimeout(t);
+  }, [saleOk]);
+
+  const productosApi = axios.create({
+    baseURL: "http://localhost:3000/api/productos",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const interceptor = productosApi.interceptors.request.use((config) => {
+      if (token) config.headers.Authorization = `Bearer ${token}`;
+      return config;
+    });
+    return () => productosApi.interceptors.request.eject(interceptor);
+  }, []);
+
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const { data } = await productosApi.get("/");
+        setGemstones(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Error al obtener productos:", err);
+        setGemstones([]);
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    fetchProductos();
   }, []);
-  
-  const handleLogout = () => {
-    localStorage.removeItem("rol");
-    localStorage.removeItem("auth");
-    navigate("/");
-  };
-
-  const totalItems = cart.reduce((sum, item) => sum + item.grams, 0);
 
   useEffect(() => {
     const savedRol = localStorage.getItem("rol");
@@ -62,21 +64,25 @@ function Dashboard() {
     return () => (document.body.style.overflow = "auto");
   }, [selectedGem, showCart]);
 
-  const agregarProducto = (nuevoProducto) => {
-    const nuevoId = gemstones.length + 1;
-    setGemstones([...gemstones, { id: nuevoId, ...nuevoProducto }]);
+  const agregarProducto = (nuevo) => {
+    setGemstones((prev) => [...prev, nuevo]);
   };
 
-  const fuse = useMemo(() => new Fuse(gemstones, { keys: ["name"], threshold: 0.3 }), [gemstones]);
-  const filteredGemstones = useMemo(() =>
-    search ? fuse.search(search).map(res => res.item) : gemstones,
+  const fuse = useMemo(
+    () =>
+      new Fuse(gemstones, {
+        keys: ["nombre_producto", "codigo_producto"],
+        threshold: 0.3,
+      }),
+    [gemstones]
+  );
+
+  const filteredGemstones = useMemo(
+    () => (search ? fuse.search(search).map((r) => r.item) : gemstones),
     [search, fuse]
   );
 
-  const gemasFiltradas = useMemo(() => {
-    if (filtro === "todos") return filteredGemstones;
-    return filteredGemstones.filter(g => g.categoria === filtro);
-  }, [filteredGemstones, filtro]);
+  const totalItems = cart.reduce((sum, item) => sum + item.grams, 0);
 
   return (
     <div className="flex-1 p-8">
@@ -88,35 +94,46 @@ function Dashboard() {
         </div>
 
         <div className="flex items-center gap-4">
-          {rol === "Administrador" && <AgregarProducto onAgregarProducto={agregarProducto} />}
+          {rol === "Administrador" && (
+            <AgregarProducto onAgregarProducto={agregarProducto} />
+          )}
 
           <div className="flex items-center gap-4">
-            {/* Menú desplegable del perfil */}
+            {/* Menú perfil */}
             <div className="relative profile-dropdown">
               {rol && (
                 <div className="flex flex-col items-center">
                   <div
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className={`relative w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md cursor-pointer transition-all duration-200 ${
-                      rol === "Administrador" ? "bg-blue-800 hover:bg-blue-900" : "bg-gray-600 hover:bg-gray-700"
+                      rol === "Administrador"
+                        ? "bg-blue-800 hover:bg-blue-900"
+                        : "bg-gray-600 hover:bg-gray-700"
                     }`}
                   >
                     {rol === "Administrador" ? "ADM" : "EMP"}
-                    <ChevronDown 
-                      size={14} 
-                      className={`ml-0.5 transition-transform duration-200 ${isProfileOpen ? 'transform rotate-180' : ''}`} 
+                    <ChevronDown
+                      size={14}
+                      className={`ml-0.5 transition-transform duration-200 ${
+                        isProfileOpen ? "rotate-180" : ""
+                      }`}
                     />
                   </div>
-                  
-                  {/* Menú desplegable */}
+
                   {isProfileOpen && (
                     <div className="absolute right-0 top-10 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50 overflow-hidden">
                       <div className="p-2 border-b border-gray-700">
                         <p className="text-sm text-white font-medium">Usuario: </p>
-                        <p className="text-xs text-gray-400">{rol === "Administrador" ? "Administrador" : "Empleado"}</p>
+                        <p className="text-xs text-gray-400">
+                          {rol === "Administrador" ? "Administrador" : "Empleado"}
+                        </p>
                       </div>
                       <button
-                        onClick={handleLogout}
+                        onClick={() => {
+                          localStorage.removeItem("rol");
+                          localStorage.removeItem("auth");
+                          navigate("/");
+                        }}
                         className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors"
                       >
                         <LogOut size={14} />
@@ -127,8 +144,8 @@ function Dashboard() {
                 </div>
               )}
             </div>
-            
-            {/* Carrito de compras */}
+
+            {/* Carrito */}
             <div className="relative">
               <ShoppingCart
                 size={32}
@@ -145,7 +162,23 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Buscador + Filtro */}
+      {/* ✅ NUEVO: Alert de compra exitosa */}
+      {saleOk && (
+        <div className="mb-4 flex items-start gap-3 border border-green-500/60 bg-green-500/15 text-green-300 rounded-xl p-3">
+          <CheckCircle2 size={18} className="mt-0.5" />
+          <div className="flex-1 text-sm">¡Venta registrada correctamente!</div>
+          <button
+            type="button"
+            onClick={() => setSaleOk(false)}
+            className="opacity-70 hover:opacity-100"
+            title="Cerrar"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* Buscador */}
       <div className="flex flex-col md:flex-row gap-4 mt-4 items-center">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-3 text-muted" size={20} />
@@ -153,141 +186,109 @@ function Dashboard() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar gemas..."
+            placeholder="Buscar productos..."
             className="w-full pl-10 pr-4 py-2 rounded-xl bg-card text-white placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
           />
           {search && (
-            <X className="absolute right-3 top-3 text-muted cursor-pointer" size={20} onClick={() => setSearch("")} />
+            <X
+              className="absolute right-3 top-3 text-muted cursor-pointer"
+              size={20}
+              onClick={() => setSearch("")}
+            />
           )}
         </div>
-
-        <select
-          value={filtro}
-          onChange={(e) => setFiltro(e.target.value)}
-          className="bg-sky-600 text-white px-4 py-2 rounded-xl focus:outline-none"
-        >
-          <option value="todos">Todos</option>
-          <option value="kit">Kits</option>
-          <option value="exclusivo">Colección exclusiva</option>
-        </select>
       </div>
 
       {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 mt-6 place-items-center">
-        {gemasFiltradas.map((gem) => (
-          <GemCard key={gem.id} gem={gem} rol={rol} onViewDetail={setSelectedGem} />
+        {filteredGemstones.map((prod) => (
+          <GemCard
+            key={prod.codigo_producto}
+            gem={prod}
+            rol={rol}
+          />
         ))}
       </div>
-      
-
-       {/* Modal Detalle + Comparación */}
-      {selectedGem && (
-        <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black bg-opacity-60 flex items-center justify-center">
-          <div className="bg-card p-6 rounded-2xl w-[700px] shadow-xl text-white relative">
-            <button
-              onClick={() => {
-                setSelectedGem(null);
-                setShowComparison(false);
-              }}
-              className="absolute top-4 right-4 text-white text-xl hover:text-red-400"
-            >
-              ×
-            </button>
-            <div className="flex gap-6">
-              <div className="w-1/2">
-                <img src={selectedGem.imagen} alt={selectedGem.name} className="rounded-xl w-full object-cover" />
-              </div>
-              <div className="w-1/2">
-                <h2 className="text-2xl font-bold text-white">{selectedGem.name}</h2>
-                <p className="text-muted mt-1 mb-2">{selectedGem.descripcion}</p>
-                <p>💵 Precio por gramo: ${selectedGem.precio}</p>
-                <p>📦 Stock: {selectedGem.stock}</p>
-
-                <button
-                  onClick={() => setShowComparison(!showComparison)}
-                  className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-bold"
-                >
-                  {showComparison ? "Ocultar comparación" : "Comparar precio"}
-                </button>
-
-                {showComparison && (
-                  <div className="mt-4 text-white text-sm space-y-1 animate-fade-in">
-                    <p>💰 Sistema 1: ${selectedGem.precio + 1800}</p>
-                    <p>💰 Sistema 2: ${selectedGem.precio + 3000}</p>
-                    <p>💰 Sistema 3: ${selectedGem.precio + 1900}</p>
-                    <p>💰 Sistema 4: ${selectedGem.precio + 2500}</p>
-                    <p>💰 Sistema 5: ${selectedGem.precio + 2300}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal Carrito */}
       {showCart && (
         <div className="fixed inset-0 z-50 backdrop-blur-sm bg-black bg-opacity-60 flex items-center justify-center">
           <div className="bg-card p-6 rounded-2xl max-w-2xl w-full text-white relative shadow-xl overflow-y-auto max-h-[90vh]">
-            <button className="absolute top-4 right-4 text-white text-xl hover:text-red-400" onClick={() => setShowCart(false)}>×</button>
+            <button
+              className="absolute top-4 right-4 text-white text-xl hover:text-red-400"
+              onClick={() => setShowCart(false)}
+            >
+              ×
+            </button>
             <h2 className="text-2xl font-bold mb-4 text-accent">🛒 Carrito</h2>
 
             {cart.length === 0 ? (
               <p className="text-muted">Tu carrito está vacío.</p>
             ) : (
-              <div className="space-y-4">
-                {cart.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between bg-background p-3 rounded-xl shadow">
-                    <div>
-                      <h3 className="font-bold text-sky-400">{item.name}</h3>
-                      <p className="text-sm text-muted">{item.grams}g x ${item.precio} = ${item.grams * item.precio}</p>
+              <>
+                <div className="space-y-4">
+                  {cart.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between bg-background p-3 rounded-xl shadow"
+                    >
+                      <div>
+                        <h3 className="font-bold text-sky-400">
+                          {item.name}
+                        </h3>
+                        <p className="text-sm text-muted">
+                          {item.grams} x ${item.precio} = $
+                          {(item.grams * item.precio).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={item.imagen}
+                          alt={item.name}
+                          className="w-16 h-16 object-cover rounded-md"
+                        />
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-red-500 font-bold hover:underline"
+                          title="Eliminar producto"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <img src={item.imagen} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="text-red-500 font-bold hover:underline"
-                        title="Eliminar producto"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
 
-                <p className="text-right font-semibold text-lg">
-                  Total: <span className="text-accent">${cart.reduce((sum, i) => sum + i.precio * i.grams, 0).toLocaleString()}</span>
+                <p className="text-right font-semibold text-lg mt-4">
+                  Total:{" "}
+                  <span className="text-accent">
+                    $
+                    {cart
+                      .reduce((sum, i) => sum + i.precio * i.grams, 0)
+                      .toLocaleString()}
+                  </span>
                 </p>
 
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    console.log("Datos del recibo:", formData, cart);
-                    setMensajeEnviado(true);
-                    setTimeout(() => setMensajeEnviado(false), 4000);
+                <button
+                  onClick={() => {
+                    clearCart();
+                    setShowCart(false);
                   }}
-                  className="mt-6 space-y-3"
+                  className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-bold"
                 >
-                  <input type="text" placeholder="Nombre completo" className="w-full p-2 rounded bg-slate-700 text-white" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} required />
-                  <input type="email" placeholder="Correo electrónico" className="w-full p-2 rounded bg-slate-700 text-white" value={formData.correo} onChange={(e) => setFormData({ ...formData, correo: e.target.value })} required />
-                  <input type="text" placeholder="Dirección" className="w-full p-2 rounded bg-slate-700 text-white" value={formData.direccion} onChange={(e) => setFormData({ ...formData, direccion: e.target.value })} required />
-                  <input type="tel" placeholder="Número de celular" className="w-full p-2 rounded bg-slate-700 text-white" value={formData.celular} onChange={(e) => setFormData({ ...formData, celular: e.target.value })} required />
-
-                  <button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded font-bold">
-                    Realizar compra
-                  </button>
-
-                  {mensajeEnviado && (
-                    <p className="text-purple-400 font-semibold mt-2 text-center">
-                      ✅ ¡Recibo enviado al correo!
-                    </p>
-                  )}
-                </form>
-
-                <button onClick={() => { clearCart(); setShowCart(false); }} className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-bold">
                   Vaciar carrito
                 </button>
-              </div>
+
+                {/* Formulario de venta */}
+                <div className="mt-6 border-t border-gray-700 pt-5">
+                  <h3 className="text-xl font-semibold mb-3 text-accent">🧾 Finalizar compra</h3>
+                  {/* 👇 le pasamos onSuccess para mostrar el alert en el Dashboard */}
+                  <CheckoutForm
+                    onClose={() => setShowCart(false)}
+                    onSuccess={() => setSaleOk(true)}
+                  />
+                </div>
+              </>
             )}
           </div>
         </div>
